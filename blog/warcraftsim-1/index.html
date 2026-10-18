@@ -184,7 +184,7 @@
     <figcaption>The research loop. Each experiment takes about two hours.</figcaption>
   </figure>
 
-  <p>The loop only works with a yardstick the agent can trust. Every run plays test games against the insane AI at full strength on the real map, and the new version and the one it started from play exactly the same matchups, so they can be compared directly. A laptop next to the desktop plays about 1,300 of these games an hour, so a verdict takes hours, not days. The dashboard below is what Claude reads at every check.</p>
+  <p><strong>Measuring progress.</strong> For any of this to work, Claude needs a reliable way to tell whether an experiment made the agent better. Training numbers don't answer that: the reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI whose handicap moves. So every run also plays <em>test games</em>, which it never trains on: the real game against the built-in AI on insane at full strength. The new version and the one it started from play exactly the same matchups, the same races and sides, so their win rates can be compared directly, and a laptop next to the desktop plays about 1,300 of these games an hour. After about 300 games each, a difference of five points stands out from the noise, so a verdict takes hours rather than days. The dashboard below is what Claude reads at every check.</p>
 
   <figure class="breakout">
     <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
