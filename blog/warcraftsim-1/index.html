@@ -267,6 +267,17 @@
   <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in its own games: it labelled the orders the agent should give, in the states the agent itself reached. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
 
   <figure class="breakout">
+    <div class="flow" role="img" aria-label="The agent plays its own game; the built-in AI labels each state the agent reaches with the order it would give; the agent learns from the result and from the labels">
+      <div class="box"><b>The agent plays</b><span>its own game: only its orders take effect</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box hl"><b>The built-in AI watches</b><span>in every state the agent reaches: the order it would give there</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>The agent learns</b><span>from winning or losing, and from imitating those orders</span></div>
+    </div>
+    <figcaption>On-policy distillation: the teacher labels the student's own states, so its advice fits the situations the student actually gets into.</figcaption>
+  </figure>
+
+  <figure class="breakout">
     <div class="duo">
       <figure>
         <video src="media/early-duelrush.mp4" poster="media/early-duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
