@@ -152,7 +152,7 @@
     <div class="stat"><b>85–89%</b><span>of real games won against the insane built-in AI, no handicap</span></div>
     <div class="stat"><b>86</b><span>experiments, run and judged by Claude Opus 5.5</span></div>
     <div class="stat"><b>11 years</b><span>of Warcraft III played in training: 840,000 games</span></div>
-    <div class="stat"><b>1 GPU</b><span>an RTX 3090 and 16 CPU cores, plus a laptop for testing</span></div>
+    <div class="stat"><b>1 GPU</b><span>an RTX 3090 and 16 CPU cores</span></div>
   </div>
 
   <p><a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reign_of_Chaos">Warcraft III</a> is a real-time strategy game from 2002: you gather gold and lumber, build a base, research technology, raise heroes and an army, and destroy your opponent while they do the same. More than twenty years on, people still play it competitively, and streamers such as former pro player <a href="https://www.twitch.tv/grubby">Grubby</a> and the casters of <a href="https://www.twitch.tv/back2warcraft">Back2Warcraft</a> bring it to large audiences.</p>
@@ -184,7 +184,7 @@
     <figcaption>The research loop. Each experiment takes about two hours.</figcaption>
   </figure>
 
-  <p><strong>Measuring progress.</strong> For any of this to work, Claude needs a reliable way to tell whether an experiment made the agent better. Training numbers don't answer that: the reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI whose handicap moves. So every run also plays <em>test games</em>, which it never trains on: the real game against the built-in AI on insane at full strength. The new version and the one it started from play exactly the same matchups, the same races and sides, so their win rates can be compared directly, and a laptop next to the desktop plays about 1,300 of these games an hour. After about 300 games each, a difference of five points stands out from the noise, so a verdict takes hours rather than days. The dashboard below is what Claude reads at every check.</p>
+  <p><strong>Measuring progress.</strong> For any of this to work, Claude needs a reliable way to tell whether an experiment made the agent better. Training numbers don't answer that: the reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI whose handicap moves. So every run also plays <em>test games</em>, which it never trains on: the real game against the built-in AI on insane at full strength. The new version and the one it started from play exactly the same matchups, the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. The dashboard below is what Claude reads at every check.</p>
 
   <figure class="breakout">
     <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
