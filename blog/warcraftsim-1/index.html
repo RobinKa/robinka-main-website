@@ -342,7 +342,16 @@
     <figcaption>One network plays one side. Hover over or tap a part to see what it does.</figcaption>
   </figure>
 
-  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The <strong>order head</strong> picks each unit's order, such as train, build, attack, move, cast or nothing. Given the order, the <strong>target heads</strong> pick what it is aimed at, either a unit in view or a point on the map. A point is picked as x and then y, so both coordinates belong to the same spot. The <strong>memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view. The <strong>value head</strong> estimates how the game will end; it reads hidden information and only helps training. The whole network is small, about 3.2 million weights. One decision for 60 units, with 120 in view, takes about 13 milliseconds on four cores of an ordinary CPU, far less than the half second it has.</p>
+  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The network has four main parts:</p>
+
+  <ul class="next">
+    <li><strong>The order head</strong> picks each unit's order, such as train, build, attack, move, cast or nothing.</li>
+    <li><strong>The target heads</strong> pick what that order is aimed at, either a unit in view or a point on the map. A point is picked as x and then y, so both coordinates belong to the same spot.</li>
+    <li><strong>The memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view.</li>
+    <li><strong>The value head</strong> predicts how the game will end. It reads hidden information and is only used in training.</li>
+  </ul>
+
+  <p>The whole network is small, about 3.2 million weights. One decision for 60 units, with 120 in view, takes about 13 milliseconds on four cores of an ordinary CPU, far less than the half second it has.</p>
 
   <p><strong>A head start from the built-in AI.</strong> Learning by playing from scratch is too hard: an agent that gives random orders almost never wins, so it has nothing to learn from. To give it a good start, I recorded thousands of games of the built-in AI playing itself and trained the agent to copy the orders the AI gave. This is called <a href="https://en.wikipedia.org/wiki/Imitation_learning">behavioral cloning</a>, and it leaves the agent playing roughly like the AI.</p>
 
