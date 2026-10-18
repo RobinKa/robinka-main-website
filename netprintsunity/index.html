@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetPrints Unity tutorial · Warlock.AI</title>
+<meta name="description" content="How to use NetPrints for visual programming in Unity3D, step by step.">
+<meta name="author" content="Robin Kahlow">
+<link rel="canonical" href="https://warlock.ai/netprintsunity/">
+<link rel="alternate" type="application/rss+xml" title="Warlock.AI" href="/feed.xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="site-nav">
+    <a class="brand" href="/">Warlock<b>.</b>AI</a>
+    <nav><a href="/#posts">Blog</a><a href="/#archive">Archive</a><a href="/#contact">Contact</a></nav>
+  </div>
+  <article class="post">
+    <h1>NetPrints Unity tutorial</h1>
+    <p class="meta">16 March 2019 · from the archive</p>
+    <p>This example shows how to use <a href="/netprints/">NetPrints</a> inside Unity3D for visual programming. It replicates part of Unity's <a href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial/moving-player">roll-a-ball tutorial</a>, where a ball rolls with user input. The completed project is in <a href="https://github.com/RobinKa/NetPrintsUnityTutorial">this repository</a>.</p>
+    <ol>
+      <li>Create a new project within your Unity project. Create a plane for the floor and a sphere, and add a <code>Rigidbody</code> to the sphere. The exact path does not matter: Unity finds the generated scripts automatically.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/NewProject.png" alt=""></li>
+      <li>Click Assemblies in the main menu. Remove all existing items and add Unity's .NET libraries (<code>mscorlib.dll</code>, <code>System.dll</code>, <code>System.Core.dll</code>), found in <code>&lt;UnityDirectory&gt;/Editor/Data/Mono/lib/mono/unity/</code>, as well as <code>UnityEngine.dll</code> in <code>&lt;UnityDirectory&gt;/Editor/Data/Managed</code>.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/Assemblies.png" alt=""></li>
+      <li>Unity can use either the generated .NET binary or C# source code. Source code can be debugged, and Unity has some bugs with generated .NET binaries and <code>MonoBehaviour</code> inheritance, so set the output mode to <code>SourceCode</code>. Then press New Class to add an empty class to the project, and open it by clicking on it. In the class settings, set the base class to <code>UnityEngine.MonoBehaviour</code>.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/MainMenu.png" alt=""></li>
+      <li>Add the <code>Update()</code> and <code>Start()</code> methods, and the attributes <code>rb</code> (type <code>UnityEngine.Rigidbody</code>) and <code>speed</code> (type <code>System.Single</code>, the same as <code>float</code>). Mark <code>speed</code> as public by clicking on it and checking Public on the right side of the editor.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/MethodsAttributes.png" alt=""></li>
+      <li>Implement the <code>Start()</code> method.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/MethodStart.png" alt=""></li>
+      <li>Implement the <code>FixedUpdate()</code> method.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/MethodFixedUpdate.png" alt=""></li>
+      <li>Press Compile. This generates a source file named <code>&lt;Namespace.Class&gt;.cs</code>. Unity only recognizes classes whose name matches the file name, so remove the namespace part from the file name. The script can now be dragged onto the sphere like any other C# script, and the sphere moves when you press WASD.<img src="https://raw.githubusercontent.com/RobinKa/NetPrintsUnityTutorial/master/Screenshots/Unity.png" alt=""></li>
+    </ol>
+  </article>
+  <footer>Robin Kahlow · <a href="mailto:tora@warlock.ai">tora@warlock.ai</a> · <a href="https://www.linkedin.com/in/robin-kahlow">LinkedIn</a> · <a href="https://github.com/RobinKa">GitHub</a> · <a href="/feed.xml">RSS</a></footer>
+</div>
+</body>
+</html>

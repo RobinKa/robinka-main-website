@@ -41,7 +41,13 @@
   a { color: var(--link); text-underline-offset: 2px; }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
   .wide { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
-  header { padding: 56px 0 24px; }
+  header { padding: 8px 0 24px; }
+  .site-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 22px; padding-bottom: 0; font: 600 15px/1 var(--sans); }
+  .site-nav .brand { color: var(--fg); text-decoration: none; letter-spacing: -.01em; font-size: 17px; }
+  .site-nav .brand b { color: var(--accent); }
+  .site-nav nav { display: flex; gap: 18px; }
+  .site-nav nav a { color: var(--muted); text-decoration: none; }
+  .site-nav nav a:hover { color: var(--link); }
   .kicker { font: 600 13px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
   h1 { font: 700 clamp(30px, 5vw, 46px)/1.12 var(--sans); letter-spacing: -.02em; margin: 40px 0 16px; }
   .dek { font-size: 20px; color: var(--muted); margin: 0; }
@@ -139,6 +145,11 @@
 </style>
 </head>
 <body>
+
+<div class="wrap site-nav">
+  <a class="brand" href="/">Warlock<b>.</b>AI</a>
+  <nav><a href="/#posts">Blog</a><a href="/#archive">Archive</a><a href="/#contact">Contact</a></nav>
+</div>
 
 <header class="wrap">
   <h1>Beating Warcraft III's insane AI with self-play reinforcement learning on one desktop</h1>
