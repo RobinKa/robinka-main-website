@@ -405,17 +405,23 @@
       </figure>
 
     <p><b>The change.</b> The AI plays normally, but a tax takes a share of the gold and lumber it gathers. The share grows after each of the agent's losses and shrinks after each win, so the agent wins about half of those games. The test games never have a tax.</p>
-    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
-        <line x1="20" y1="84" x2="285" y2="84" stroke="var(--faint)" stroke-width="1.5"/>
-        <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="20,20 50,26 70,22 95,36 120,44 145,40 170,56 200,64 230,72 260,80 285,83"/>
-        <line x1="20" y1="52" x2="285" y2="52" stroke="var(--good)" stroke-width="2" stroke-dasharray="5 4"/>
-        <g font-size="11" fill="var(--muted)">
-          <text x="24" y="14" fill="var(--accent)">the AI's tax: a share of its income taken</text>
-          <text x="186" y="46" fill="var(--good)">agent wins ~half</text>
-          <text x="285" y="97" text-anchor="end">training →</text>
-        </g>
-      </svg></figure>
-    <p><b>The outcome.</b> As the agent improved, the tax fell towards zero. By 2 October it won 79% of its test games against the AI.</p>
+    <figure class="mini"><svg viewBox="0 0 320 156" aria-hidden="true">
+<line x1="42" y1="122.0" x2="312" y2="122.0" stroke="var(--chart-grid)"/><text x="37" y="125.5" text-anchor="end" font-size="10" fill="var(--muted)">0%</text>
+<line x1="42" y1="95.0" x2="312" y2="95.0" stroke="var(--chart-grid)"/><text x="37" y="98.5" text-anchor="end" font-size="10" fill="var(--muted)">20%</text>
+<line x1="42" y1="68.0" x2="312" y2="68.0" stroke="var(--chart-grid)"/><text x="37" y="71.5" text-anchor="end" font-size="10" fill="var(--muted)">40%</text>
+<line x1="42" y1="41.0" x2="312" y2="41.0" stroke="var(--chart-grid)"/><text x="37" y="44.5" text-anchor="end" font-size="10" fill="var(--muted)">60%</text>
+<line x1="42" y1="14.0" x2="312" y2="14.0" stroke="var(--chart-grid)"/><text x="37" y="17.5" text-anchor="end" font-size="10" fill="var(--muted)">80%</text>
+<text x="42.0" y="136" text-anchor="middle" font-size="10" fill="var(--muted)">0</text>
+<text x="104.8" y="136" text-anchor="middle" font-size="10" fill="var(--muted)">10</text>
+<text x="167.6" y="136" text-anchor="middle" font-size="10" fill="var(--muted)">20</text>
+<text x="230.4" y="136" text-anchor="middle" font-size="10" fill="var(--muted)">30</text>
+<text x="293.2" y="136" text-anchor="middle" font-size="10" fill="var(--muted)">40</text>
+<text x="312" y="149" text-anchor="end" font-size="10" fill="var(--muted)">hours of training</text>
+<text x="8" y="68" font-size="10" fill="var(--muted)" transform="rotate(-90 8 68)" text-anchor="middle">the AI's tax</text>
+<polyline fill="none" stroke="var(--accent)" stroke-width="2.2" points="45.7,21.8 49.8,24.8 53.8,25.4 58.8,47.0 63.8,63.1 69.0,63.4 74.7,65.8 80.7,67.9 85.9,69.8 91.1,77.7 96.6,71.0 102.1,75.2 108.5,78.3 116.8,85.9 124.9,90.7 132.9,93.4 140.9,95.9 146.9,93.8 152.2,102.6 157.3,100.1 161.9,106.8 166.5,107.4 170.9,110.5 174.8,112.9 178.4,114.1 182.0,115.3 185.6,118.1 189.2,114.7 192.9,120.2 196.5,119.6 200.1,120.5 203.8,121.1 207.5,119.3 211.2,119.6 215.0,118.1 218.6,118.1 222.3,117.7 226.0,110.8 229.6,112.4 233.2,114.9 236.9,116.9 240.5,116.9 244.4,117.0 248.2,118.1 252.0,115.7 255.7,115.5 259.4,116.9 263.2,116.5 267.0,117.3 270.8,117.9 274.6,118.1 278.4,117.7 282.1,119.0 285.9,119.0 289.6,117.1 293.3,117.9 297.0,117.1 300.8,118.7 304.5,118.0 308.2,118.3 312.0,114.7 312.1,114.9"/>
+<text x="98.5" y="41.0" font-size="10.5" fill="var(--accent)">tax up after each loss, down after each win</text>
+</svg></figure>
+    <p><b>The outcome.</b> As the agent improved, the tax fell from about 75% to almost zero, averaged over all matchups. By 2 October it won 79% of its test games against the AI.</p>
     <figure class="clip">
         <video src="media/duelrush.mp4" poster="media/duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>2 October.</b> The agent (night elf, red) beats the normal AI (orc, blue) in two minutes. 4× speed.</figcaption>
