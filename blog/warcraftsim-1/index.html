@@ -356,7 +356,7 @@
 
   <h2>Measuring progress</h2>
 
-  <p>Training numbers can't tell whether a change made the agent better. The reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI with a changing handicap. So every training run also plays <em>test games</em> that it never learns from. They are real games against the built-in AI on insane, without any handicap. Each experiment is a new run that starts from the best agent so far with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
+  <p>Training numbers can't tell whether a change made the agent better. The reward includes the small material rewards, not just wins and losses, and the training opponents change all the time, from past versions of the agent to a built-in AI with a changing handicap. So every training run also plays <em>test games</em> that it never learns from. They are real games against the built-in AI on insane, without any handicap. Each experiment is a new run that starts from the best agent so far with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
 
   <figure class="breakout">
     <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
@@ -738,8 +738,8 @@
 
   <div class="step">
     <div class="when">16 October</div>
-    <h4>Half the hint</h4>
-    <p><b>What was wrong.</b> Besides +1 for a win and −1 for a loss, the agent gets small rewards along the way for material, the value of its units and buildings compared with the opponent's. Hints like this can be gamed. Pay a reward for every unit trained, and the agent could train a footman, let it die and train another, collecting reward forever without getting closer to a win. So the reward is the <em>change</em> in the material lead (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>). That gives +135 when the footman, worth 135 gold, is trained, and −135 when it dies. A loop pays nothing, and the best play stays the same.</p>
+    <h4>Halve the material rewards</h4>
+    <p><b>What was wrong.</b> Besides +1 for a win and −1 for a loss, the agent gets small rewards along the way for material, the value of its units and buildings compared with the opponent's. Rewards like this can be gamed. Pay a reward for every unit trained, and the agent could train a footman, let it die and train another, collecting reward forever without getting closer to a win. So the reward is the <em>change</em> in the material lead (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>). That gives +135 when the footman, worth 135 gold, is trained, and −135 when it dies. A loop pays nothing, and the best play stays the same.</p>
     <figure class="mini"><svg viewBox="0 0 505 132" aria-hidden="true">
         <g font-size="11" fill="var(--muted)" text-anchor="middle">
           <text x="200" y="16">train a footman</text><text x="268" y="16">it dies</text><text x="336" y="16">train another</text><text x="398" y="16">it dies</text><text x="446" y="16">total</text>
