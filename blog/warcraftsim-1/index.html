@@ -384,7 +384,9 @@
 
   <h2>How it learned</h2>
 
-  <p>A real game lasts up to 25 minutes, and the agent decides twice a second, for all of its units at once: 25 × 60 × 2, about 3,000 decisions per side before the one reward, a win or a loss, arrives. An agent that loses every game has nothing to learn from. Even an agent trained by behavioral cloning on the built-in AI's games on the real map lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
+  <p><strong>The problem.</strong> A real game lasts up to 25 minutes, and the agent decides twice a second, for all of its units at once: 25 × 60 × 2, about 3,000 decisions per side before the one reward, a win or a loss, arrives. With a single result at the end it is hard to tell which of those decisions mattered, and an agent that loses every game gets nothing to learn from. Even an agent trained by behavioral cloning on the built-in AI's games on the real map lost all 40 of its test games.</p>
+
+  <p><strong>A curriculum.</strong> So the agent started with easier problems and moved on as it got better: small fights first, then whole games on a small map with sped-up rules, then longer games, then the real map, first with fast rules and then with the game's own. At each stage a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
@@ -398,7 +400,7 @@
       <div class="arrow" aria-hidden="true">→</div>
       <div class="box hl"><b>Echo Isles, real rules</b><span>the real game · 49% at once, now 89%</span></div>
     </div>
-    <figcaption>Each step started from the previous step's best agent.</figcaption>
+    <figcaption>The curriculum: each stage started from the previous stage's best agent.</figcaption>
   </figure>
 
   <p><strong>Micro fights</strong> came first: small battles of a hero and a few units a side, over in seconds. They are where the pieces were worked out: units as tokens, targets as pointers, behavioral cloning of a scripted player as the start, and a league of past selves.</p>
