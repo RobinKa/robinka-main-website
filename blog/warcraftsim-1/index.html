@@ -167,13 +167,13 @@
 
   <h2>An AI runs the lab</h2>
 
-  <p>Claude worked in a loop. Every experiment was a new training run that started from the best agent so far, with one change: a reward weight, a new input, a different mix of opponents. Every half hour it checked on the run: is it alive, how fast is it, any errors, and how does the new version play against the one it started from? Once each had played about 300 test games, Claude called the result, wrote it into the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> and started the next run, day and night.</p>
+  <p>Claude worked in a loop. Every experiment was a new training run that started from the best agent so far, with one change: a reward weight, a new input, a different mix of opponents. Every half hour it checked on the run: is it alive, how fast is it, any errors, and how does the new version play against the one it started from? Once each had played about 300 test games, Claude called the result, wrote it into the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> and started the next run.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="I set the goal; Claude picks a change, starts a run, checks it every half hour, judges it on test games and writes it up, then starts again">
       <div class="box"><b>Me</b><span>the goal and the direction</span></div>
       <div class="arrow" aria-hidden="true">→</div>
-      <div class="group"><span class="label">Claude Opus 5.5, around the clock</span>
+      <div class="group"><span class="label">Claude Opus 5.5</span>
         <div class="box"><b>Pick a change</b><span>from the log, the data and papers</span></div>
         <div class="box"><b>Start a run</b><span>from the best agent, one change</span></div>
         <div class="box hl"><b>Check every 30 min</b><span>health, speed, new against old</span></div>
@@ -181,7 +181,7 @@
       </div>
       <div class="arrow" aria-hidden="true">↺</div>
     </div>
-    <figcaption>The research loop. Each experiment takes about two hours, so a day and a night fit about ten.</figcaption>
+    <figcaption>The research loop. Each experiment takes about two hours.</figcaption>
   </figure>
 
   <p>The loop only works with a yardstick the agent can trust. Every run plays test games against the insane AI at full strength on the real map, and the new version and the one it started from play exactly the same matchups, so they can be compared directly. A laptop next to the desktop plays about 1,300 of these games an hour, so a verdict takes hours, not days. The dashboard below is what Claude reads at every check.</p>
