@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude ran 86 experiments to beat Warcraft III's insane AI</title>
+<meta name="description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Claude ran 86 experiments to beat Warcraft III's insane AI">
+<meta property="og:description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research.">
+<meta property="og:url" content="https://warlock.ai/blog/warcraftsim-1/">
+<meta property="og:image" content="https://warlock.ai/blog/warcraftsim-1/media/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://warlock.ai/blog/warcraftsim-1/">
+<style>
+  :root {
+    --bg: #fbfaf7; --fg: #1d2127; --muted: #5d6673; --faint: #e7e4dd; --card: #ffffff;
+    --accent: #b8541f; --accent-soft: #f6e6db; --good: #2f8a5f; --link: #a3471a;
+    --chart-bar: #b8541f; --chart-bar-2: #d9a07c; --chart-grid: #e4e0d8;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Charter, "Bitstream Charter", "Iowan Old Style", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161a; --fg: #e6e3dc; --muted: #9aa3ae; --faint: #2a2e35; --card: #1b1e23;
+      --accent: #e08a52; --accent-soft: #3a2a20; --good: #5cc28f; --link: #f0a070;
+      --chart-bar: #e08a52; --chart-bar-2: #8e5c3c; --chart-grid: #2c3037;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161a; --fg: #e6e3dc; --muted: #9aa3ae; --faint: #2a2e35; --card: #1b1e23;
+    --accent: #e08a52; --accent-soft: #3a2a20; --good: #5cc28f; --link: #f0a070;
+    --chart-bar: #e08a52; --chart-bar-2: #8e5c3c; --chart-grid: #2c3037;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 18px/1.65 var(--serif); }
+  a { color: var(--link); text-underline-offset: 2px; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  .wide { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 56px 0 24px; }
+  .kicker { font: 600 13px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  h1 { font: 700 clamp(30px, 5vw, 46px)/1.12 var(--sans); letter-spacing: -.02em; margin: 12px 0 16px; }
+  .dek { font-size: 20px; color: var(--muted); margin: 0; }
+  .links { margin: 18px 0 0; font: 600 15px/1 var(--sans); }
+  .links a { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--faint); border-radius: 999px; background: var(--card); color: var(--fg); text-decoration: none; }
+  .links a:hover { border-color: var(--accent); color: var(--link); }
+  h2 { font: 700 26px/1.25 var(--sans); letter-spacing: -.01em; margin: 56px 0 12px; }
+  h3 { font: 650 19px/1.35 var(--sans); margin: 32px 0 6px; }
+  p { margin: 0 0 18px; }
+  figure { margin: 28px 0; }
+  figcaption { font: 14px/1.5 var(--sans); color: var(--muted); margin-top: 10px; }
+  video, img { width: 100%; height: auto; display: block; border-radius: 8px; background: #000; }
+  img.shot { background: transparent; border: 1px solid var(--faint); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0 8px; }
+  .stat { background: var(--card); border: 1px solid var(--faint); border-radius: 10px; padding: 14px 14px 12px; }
+  .stat b { display: block; font: 750 28px/1.1 var(--sans); color: var(--accent); letter-spacing: -.02em; }
+  .stat span { display: block; font: 13.5px/1.4 var(--sans); color: var(--muted); margin-top: 6px; }
+  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  ul.next { padding-left: 1.2em; margin: 0 0 1.2em; }
+  ul.next li { margin: 0 0 .5em; }
+  .note { font: 15px/1.55 var(--sans); background: var(--accent-soft); border-radius: 8px; padding: 12px 14px; margin: 22px 0; }
+  .twist { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; margin: 24px 0; }
+  .twist h3 { margin-top: 0; }
+  .twist .num { font: 700 15px/1 var(--sans); color: var(--accent); }
+  code { font: 0.86em var(--mono); background: var(--faint); padding: 1px 5px; border-radius: 4px; }
+  .chart { background: var(--card); border: 1px solid var(--faint); border-radius: 10px; padding: 18px 16px 10px; }
+  .chart svg { width: 100%; height: auto; display: block; font-family: var(--sans); }
+  .chart .title { font: 650 15px/1.3 var(--sans); margin: 0 0 4px; }
+  .chart .sub { font: 13px/1.4 var(--sans); color: var(--muted); margin: 0 0 8px; }
+  /* wider than the text: diagrams and screenshots */
+  .breakout { width: min(1080px, calc(100vw - 32px)); margin-left: 50%; transform: translateX(-50%); }
+  .breakout > figcaption { max-width: 688px; margin-left: auto; margin-right: auto; }
+  /* diagrams */
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; font-family: var(--sans); }
+  .box { background: var(--card); border: 1px solid var(--faint); border-radius: 10px; padding: 12px 14px; min-width: 140px; flex: 1 1 140px; max-width: 240px; }
+  .box b { display: block; font: 650 15px/1.3 var(--sans); }
+  .box span { display: block; font: 13px/1.45 var(--sans); color: var(--muted); margin-top: 4px; }
+  .box.hl { border-color: var(--accent); }
+  .arrow { display: flex; align-items: center; justify-content: center; padding: 0 8px; color: var(--muted); font: 20px/1 var(--sans); }
+  .group { border: 1px dashed var(--muted); border-radius: 12px; padding: 22px 10px 10px; position: relative; display: flex; gap: 10px; flex: 3 1 480px; max-width: 760px; }
+  .group .box { max-width: none; }
+  .group > .label { position: absolute; top: -10px; left: 12px; background: var(--bg); padding: 0 6px; font: 600 12px/1.4 var(--sans); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  @media (max-width: 760px) { .flow { flex-direction: column; align-items: center; } .arrow { transform: rotate(90deg); padding: 6px 0; } .box, .group { max-width: 100%; width: 100%; flex: none; } .group { flex-direction: column; } }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .duo figure { margin: 0; }
+  .duo figcaption { margin-top: 8px; }
+  @media (max-width: 760px) { .duo { grid-template-columns: 1fr; } }
+  footer { margin: 72px 0 56px; padding-top: 20px; border-top: 1px solid var(--faint); font: 14px/1.6 var(--sans); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="kicker">Reinforcement learning · Warcraft III · AI research agents</div>
+  <h1>Claude ran 86 experiments to beat Warcraft III's insane AI</h1>
+  <p class="dek">In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against the hardest one, insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research. I mostly pointed the way.</p>
+  <p class="links"><a href="https://github.com/RobinKa/warcraftsim"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>github.com/RobinKa/warcraftsim</a></p>
+</header>
+
+<div class="wide">
+  <figure>
+    <video src="media/clip.mp4" poster="media/poster.jpg" autoplay muted loop playsinline controls></video>
+    <figcaption>A training game at 2× speed in the real game client: the agent (night elf, red) rolls through the insane orc AI's base and kills its Blademaster. The panel shows what the agent was thinking: how it expects the game to end (rising towards +1, a win), its reward, both sides' material and resources, and the orders it gave.</figcaption>
+  </figure>
+</div>
+
+<main class="wrap">
+
+  <div class="stats">
+    <div class="stat"><b>85–89%</b><span>of real games won against the insane built-in AI, no handicap</span></div>
+    <div class="stat"><b>86</b><span>experiments, run and judged by Claude Opus 5.5</span></div>
+    <div class="stat"><b>11 years</b><span>of Warcraft III played in training: 840,000 games</span></div>
+    <div class="stat"><b>1 GPU</b><span>an RTX 3090 and 16 CPU cores, plus a laptop for testing</span></div>
+  </div>
+
+  <p><a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reign_of_Chaos">Warcraft III</a> is a real-time strategy game from 2002: you gather gold and lumber, build a base, research technology, raise heroes and an army, and destroy your opponent while they do the same. More than twenty years on, people still play it competitively, and streamers such as two-time world champion <a href="https://www.twitch.tv/grubby">Grubby</a> and the casters of <a href="https://www.twitch.tv/back2warcraft">Back2Warcraft</a> bring it to large audiences.</p>
+
+  <p>This post is about two AIs. The first plays Warcraft III: the whole game, on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game's own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>. It now wins about nine games in ten. The second built the first. Claude Opus 5.5, working as a coding agent in <a href="https://claude.com/product/claude-code">Claude Code</a>, wrote the code and ran the research: it launched every experiment, watched it, judged it and chose the next one. My part was mostly to say where to go.</p>
+
+  <h2>Why this is hard</h2>
+
+  <p>A game lasts 10 to 25 minutes: thousands of decisions for dozens of units at once, four races with their own units, buildings and spells, and a fog of war that hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind's <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers' help and a datacenter: AlphaStar trained 12 agents for 44 days on 32 TPUs each. We had one desktop, a game that was never built for any of this, and an AI that runs experiments.</p>
+
+  <h2>An AI runs the lab</h2>
+
+  <p>Claude worked in a loop. Every experiment was a new training run that started from the best agent so far, with one change: a reward weight, a new input, a different mix of opponents. Every half hour it checked on the run: is it alive, how fast is it, any errors, and how does the new version play against the one it started from? Once each had played about 300 test games, Claude called the result, wrote it into the experiment log and started the next run, day and night.</p>
+
+  <figure class="breakout">
+    <div class="flow" role="img" aria-label="I set the goal; Claude picks a change, starts a run, checks it every half hour, judges it on test games and writes it up, then starts again">
+      <div class="box"><b>Me</b><span>the goal and the direction</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="group"><span class="label">Claude Opus 5.5, around the clock</span>
+        <div class="box"><b>Pick a change</b><span>from the log, the data and papers</span></div>
+        <div class="box"><b>Start a run</b><span>from the best agent, one change</span></div>
+        <div class="box hl"><b>Check every 30 min</b><span>health, speed, new against old</span></div>
+        <div class="box"><b>Judge and write up</b><span>~300 test games each, then the log</span></div>
+      </div>
+      <div class="arrow" aria-hidden="true">↺</div>
+    </div>
+    <figcaption>The research loop. Each experiment takes about two hours, so a day and a night fit about ten.</figcaption>
+  </figure>
+
+  <p>The loop only works with a yardstick the agent can trust. Every run plays test games against the insane AI at full strength on the real map, and the new version and the one it started from play exactly the same matchups, so they can be compared directly. A laptop next to the desktop plays about 1,300 of these games an hour, so a verdict takes hours, not days. The dashboard below is what Claude reads at every check.</p>
+
+  <figure class="breakout">
+    <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
+    <figcaption>The dashboard's matchup tables: the current best agent (left) and the version before it (right) against the insane AI, race by race, over the same 1,500 test games each.</figcaption>
+  </figure>
+
+  <p>In about three and a half weeks, Claude co-wrote 496 of the project's 497 commits: some 30,000 lines of Python, plus the C of a DLL that runs inside the game, the game-script harness and a C++ inference loop. It ran 86 whole-game experiments and kept a lab notebook of them, along with notes it reads back at the start of every new session. Most experiments fail. Of the 21 on the real map so far, five were gains; the rest were level or worse, and the log keeps every one with its numbers.</p>
+
+  <p>It also kept the lab running. When a Warcraft III window popped up on my desktop in the middle of training, it traced it to a game process that had inherited my screen, and fixed it. When the laptop dropped out every twelve hours, it found that the laptop's remote login wanted a person to approve it again. That one it could not fix alone: I had to turn the check off.</p>
+
+  <p>My part was the direction: beat insane on the real map, try AlphaStar's ideas, find out what limits learning, keep the experiments bold. And now and then a correction, when it changed more in a run than I had asked for.</p>
+
+  <h2>Running the real game, fast</h2>
+
+  <p>Warcraft III has no API for bots, no headless mode and no faster-than-real-time option. It is a 32-bit Windows program, and its rules, pathfinding, spells and AI are decades of details that no reimplementation would get right. So we run the real thing, under <a href="https://www.winehq.org/">Wine</a> on Linux, about fifty copies at once, and drive it from Python.</p>
+
+  <figure class="breakout">
+    <div class="flow" role="img" aria-label="Python talks to a DLL inside each game, which talks to a script inside the map">
+      <div class="box hl"><b>Python</b><span>the learner, the inference loop, ~56 games at once</span></div>
+      <div class="arrow" aria-hidden="true">⇄</div>
+      <div class="group"><span class="label">one Wine process per game</span>
+        <div class="box"><b>w3shim.dll</b><span>a virtual clock; stops the game at every step until Python answers</span></div>
+        <div class="box"><b>Warcraft III 1.29</b><span>the unmodified game</span></div>
+        <div class="box"><b>The harness</b><span>JASS injected into the map: what the player sees, and its orders carried out</span></div>
+      </div>
+    </div>
+    <figcaption>Three pieces make the game playable from Python.</figcaption>
+  </figure>
+
+  <p><strong>The harness</strong>, written in the game's own map-scripting language, reports what the player can see every half second of game time and carries out the agent's orders. <strong>The shim</strong>, a small DLL inside the game process, replaces the game's clocks with a virtual one: the game runs as fast as the CPU allows and waits at every step for Python's orders. Games are deterministic, so a replay reproduces a game step for step. That is how every video here was made.</p>
+
+  <figure class="chart">
+    <p class="title">Self-play speed, agent steps per second</p>
+    <p class="sub">An agent step is half a second of game time for one player (two steps per game second, and two players in a self-play game). Each bar adds one optimization to the ones above it.</p>
+    <svg viewBox="0 0 680 330" role="img" aria-label="Throughput rose from 560 to 2280 agent steps per second">
+      <g font-size="12.5" fill="currentColor">
+        <!-- rows: label at x=0..210, bar from 220, scale 2280 -> 400px -->
+        <g fill="var(--muted)" text-anchor="end">
+          <text x="210" y="22">the starting point</text>
+          <text x="210" y="56">units read in C, not in JASS</text>
+          <text x="210" y="90">five games per map load</text>
+          <text x="210" y="124">the learner as CUDA graphs</text>
+          <text x="210" y="158">games draw nothing</text>
+          <text x="210" y="192">Wine with fsync</text>
+          <text x="210" y="226">an inference loop in C++</text>
+          <text x="210" y="260">native Linux, not WSL</text>
+          <text x="210" y="294">the game's code, faster</text>
+        </g>
+        <g fill="var(--chart-bar)">
+          <rect x="220" y="8" width="98" height="20" rx="3"/>
+          <rect x="220" y="42" width="126" height="20" rx="3"/>
+          <rect x="220" y="76" width="144" height="20" rx="3"/>
+          <rect x="220" y="110" width="175" height="20" rx="3"/>
+          <rect x="220" y="144" width="195" height="20" rx="3"/>
+          <rect x="220" y="178" width="225" height="20" rx="3"/>
+          <rect x="220" y="212" width="261" height="20" rx="3"/>
+          <rect x="220" y="246" width="325" height="20" rx="3"/>
+          <rect x="220" y="280" width="400" height="20" rx="3"/>
+        </g>
+        <g fill="var(--fg)" font-weight="600">
+          <text x="324" y="22">560</text>
+          <text x="352" y="56">719</text>
+          <text x="370" y="90">822</text>
+          <text x="401" y="124">1,000</text>
+          <text x="421" y="158">1,110</text>
+          <text x="451" y="192">1,280</text>
+          <text x="487" y="226">1,490</text>
+          <text x="551" y="260">1,850</text>
+          <text x="626" y="294">2,280</text>
+        </g>
+      </g>
+    </svg>
+  </figure>
+
+  <p>Most of the speed came from removing waste, not adding hardware: games draw nothing, five share one load of the map, the per-unit bookkeeping moved from the game's script into C, and the network runs as CUDA graphs from a C++ loop. Today the desktop plays about 48 games at once, each about 15 times faster than real time: roughly <strong>730 hours of Warcraft III every hour</strong>.</p>
+
+  <h2>The agent</h2>
+
+  <figure class="breakout">
+    <div class="flow" role="img" aria-label="Unit tokens and a player token go through a transformer; each own unit gets an order and a target">
+      <div class="box"><b>What it sees</b><span>up to 160 units in view, as tokens: type, owner, position, health, current order</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>Plus a player token</b><span>gold, lumber, food, upgrades, and optionally a target strategy</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box hl"><b>Transformer</b><span>5 layers over all tokens, with a small memory</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>Each own unit</b><span>an order (~400 kinds), then its target: a unit, or a point on the map</span></div>
+    </div>
+    <figcaption>One network plays one side. A value head also estimates how the game will end.</figcaption>
+  </figure>
+
+  <p>The agent sees only what its player sees, through the fog of war, and every half second it gives each of its units an order: train this, build that there, attack that unit, move here. It has no screen and no mouse. It starts as a copy of the built-in AI, trained to imitate the AI's orders in thousands of its games. Then it learns from playing, with reinforcement learning (<a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five), against a league of opponents: itself, its past selves and the built-in AI.</p>
+
+  <h2>Watching it learn</h2>
+
+  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing.</p>
+
+  <figure class="breakout">
+    <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
+      <div class="box"><b>Micro fights</b><span>a few units a side, seconds long · 91% against a scripted opponent</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>2-minute games</b><span>a small duel map, everything 7× faster · 79% against the built-in AI</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>6-minute games</b><span>half costs, production 3× faster · 80% against insane</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>Echo Isles, fast rules</b><span>the real map · ~55–60% against insane</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box hl"><b>Echo Isles, real rules</b><span>the real game · 49% at once, now 89%</span></div>
+    </div>
+    <figcaption>Each step started from the previous step's best agent.</figcaption>
+  </figure>
+
+  <p><strong>The opponent needed a curriculum too.</strong> The first self-play run won none of its last 75 games against the built-in AI. Giving the AI a late start backfired: the agent learned to rush the idle AI. What worked was a tax: the AI loses a share of everything it gathers, more after each of the agent's losses and less after each win, so the agent wins about half of those games and always has something to learn from. The tax fell towards zero as the agent improved. The test games never have a tax: they are always against the AI at full strength.</p>
+
+  <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So in "shadow" games the built-in AI also played the agent's side: the harness recorded each order it gave as a label for that moment, then undid it, and only the agent's own orders took effect. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
+
+  <figure class="breakout">
+    <div class="duo">
+      <figure>
+        <video src="media/early-duelrush.mp4" poster="media/early-duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>27 September, the 2-minute map.</b> The copy of the built-in AI on its first day of self-play (orc, blue) loses to the <em>easy</em> AI in 84 seconds. 3× speed.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/duelrush.mp4" poster="media/duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>2 October, the same map.</b> The agent (night elf, red) beats the normal AI (orc, blue) in two minutes. 4× speed.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/early-duelfast.mp4" poster="media/early-duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>3 October, the 6-minute map.</b> The agent (undead, blue) loses its base to an insane AI (night elf, red) that loses 54% of its income to the tax. The last two minutes at 4×.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>14 October, the same map.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
+      </figure>
+<!-- 15 October clip: added once rendered -->
+      <figure>
+        <video src="media/now-echo.mp4" poster="media/now-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>18 October, the real game.</b> The agent (night elf, red) destroys the base of the insane AI (human, blue) at full strength, eleven minutes in. The last two minutes at 4×.</figcaption>
+      </figure>
+    </div>
+    <figcaption>Then and now, at each rung of the ladder. The videos have sound: unmute them in the player.</figcaption>
+  </figure>
+
+  <p>Moving to the bigger map needed one change in how the agent sees positions: measured from its own base, at the scale it already knew. After that, the agent trained on the fast rules won 49% of its test games under the real rules straight away.</p>
+
+  <h2>What moved the needle</h2>
+
+  <figure class="chart">
+    <p class="title">The real game on Echo Isles: games won against the insane AI</p>
+    <p class="sub">Each bar is the best agent after one change, measured in test games it never trained on.</p>
+    <svg viewBox="0 0 680 300" role="img" aria-label="Win rate rose from 49 to 89 percent over six steps">
+      <g font-family="inherit" font-size="12.5">
+        <g stroke="var(--chart-grid)" stroke-width="1">
+          <line x1="50" y1="30" x2="670" y2="30"/><line x1="50" y1="80" x2="670" y2="80"/>
+          <line x1="50" y1="130" x2="670" y2="130"/><line x1="50" y1="180" x2="670" y2="180"/>
+          <line x1="50" y1="230" x2="670" y2="230"/>
+        </g>
+        <g fill="var(--muted)" text-anchor="end">
+          <text x="42" y="34">100%</text><text x="42" y="84">75%</text><text x="42" y="134">50%</text><text x="42" y="184">25%</text><text x="42" y="234">0</text>
+        </g>
+        <!-- bars: base y=230, 100% = 200px; x centers 103, 206, 309, 412, 515, 618; width 64 -->
+        <g fill="var(--chart-bar)">
+          <rect x="71" y="132" width="64" height="98" rx="3" fill="var(--chart-bar-2)"/>
+          <rect x="174" y="112" width="64" height="118" rx="3" fill="var(--chart-bar-2)"/>
+          <rect x="277" y="106" width="64" height="124" rx="3" fill="var(--chart-bar-2)"/>
+          <rect x="380" y="86" width="64" height="144" rx="3"/>
+          <rect x="483" y="66" width="64" height="164" rx="3"/>
+          <rect x="586" y="52" width="64" height="178" rx="3"/>
+        </g>
+        <g fill="var(--fg)" font-weight="700" text-anchor="middle" font-size="14">
+          <text x="103" y="124">49%</text><text x="206" y="104">59%</text><text x="309" y="98">62%</text>
+          <text x="412" y="78">72%</text><text x="515" y="58">82%</text><text x="618" y="44">89%</text>
+        </g>
+        <g fill="var(--muted)" text-anchor="middle">
+          <text x="103" y="250">first real games</text><text x="206" y="250">a longer horizon</text><text x="309" y="250">wider building</text>
+          <text x="412" y="250">half the shaping</text><text x="515" y="250">a looser anchor</text><text x="618" y="250">strategies</text>
+          <text x="103" y="266"></text><text x="206" y="266"></text><text x="309" y="266">search</text>
+          <text x="412" y="266">(see 2)</text><text x="515" y="266">(see 3)</text><text x="618" y="266">(see 4)</text>
+        </g>
+      </g>
+    </svg>
+  </figure>
+
+  <p>The first two steps were small fixes: rewards counted further into the future, and a wider search for where a building fits. Four other results surprised us.</p>
+
+  <div class="twist">
+    <span class="num">1</span>
+    <h3>Imitating the AI stopped helping</h3>
+    <p>Imitation and advice got the agent started, but once it beat its teacher they held it back. Switching the advice off was one of the larger gains on the small maps. On Echo Isles every attempt to mix imitation back in was level or worse, and the stronger doses undid how the agent had learned to fight.</p>
+  </div>
+
+  <div class="twist">
+    <span class="num">2</span>
+    <h3>Half the hint, ten points more</h3>
+    <p>Besides +1 for a win and −1 for a loss, the agent gets a small reward for gaining material: the cost of its living units and buildings against the opponent's. This <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a> gives feedback long before the end without changing what the best play is. Halving its weight took the win rate from 62% to 72%: with less credit for material, the agent played more for the win.</p>
+  </div>
+
+  <div class="twist">
+    <span class="num">3</span>
+    <h3>The anchor was holding it back</h3>
+    <p>To keep training stable, the agent is pulled towards an "anchor", an earlier checkpoint of itself. Experiment after experiment ended level. <a href="https://arxiv.org/abs/1812.06162">Measuring the gradient noise</a> showed why: in each update the agent's own learning signal was about 1% signal and 99% noise, while the pull back to the anchor was clean and consistent. A quarter of the pull let the agent move, and after about ninety minutes it pulled ahead: 74% to 82%.</p>
+  </div>
+
+  <div class="twist">
+    <span class="num">4</span>
+    <h3>Giving it a plan</h3>
+    <p>Following <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the agent's training games come with a target strategy, a build order and tech path drawn from 8,072 in the AI's games and in human replays, plus a small reward for following it. It follows the targets only loosely, yet it became a better player: 84% to 89%.</p>
+  </div>
+
+  <p>Here is the agent today, with each of the four races.</p>
+
+  <figure class="breakout">
+    <div class="duo">
+      <figure>
+        <video src="media/race-human.mp4" poster="media/race-human-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>Human</b> (red) against night elf (blue): the agent's army burns down the night elf base.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/race-orc.mp4" poster="media/race-orc-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>Orc</b> (red) against human (blue): a level-5 Far Seer leads the army through the human base.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/race-undead.mp4" poster="media/race-undead-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>Undead</b> (blue) against night elf (red): the undead army kills the Priestess of the Moon in her own base.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/race-nightelf.mp4" poster="media/race-nightelf-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>Night elf</b> (blue) against undead (red): the agent's army takes the undead base apart.</figcaption>
+      </figure>
+    </div>
+    <figcaption>One won game with each race against the insane AI on Echo Isles, the last two minutes at 4×. As night elf it wins almost every game; human and undead are its weakest races.</figcaption>
+  </figure>
+
+  <h2>What it can't do yet</h2>
+
+  <p><strong>It plays one strategy.</strong> It wins with an early rush of cheap units, half its wins inside ten minutes. When the rush fails the game goes long, and almost all of its losses are long games. In the best agent's 183 long losses, 27 minutes on average, it built a big base with 35 workers to the AI's 16, but stayed with two or three kinds of cheap unit to the AI's nine, and three upgrades to the AI's seventeen.</p>
+
+  <figure class="breakout">
+    <video src="media/late-loss.mp4" poster="media/late-loss-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+    <figcaption>A long loss by its predecessor, from minute 23 at 4× speed: the agent (human, blue) has 67 workers to the AI's 9, five altars, five barracks, a field of farms and 97 footmen as its only unit. The insane AI (undead, red) made ten kinds of unit, among them gargoyles, abominations and frost wyrms, and 18 upgrades to the agent's 2. It wipes out the army, then the base.</figcaption>
+  </figure>
+
+  <p><strong>It neglects heroes:</strong> about one a game, where the built-in AI raises one and a half or more. In the clip at the top it has none at all.</p>
+
+  <p><strong>It has only met the built-in AI.</strong> Good human players beat the insane AI every time; they are far stronger than anything the agent has faced. A human would likely see the rush coming and hold it off, and the long game that follows is where the agent is weakest.</p>
+
+  <div class="note">Every win rate here comes from test games the agent never trained on: the real game on Echo Isles, all sixteen race matchups, against the built-in AI on insane at full strength.</div>
+
+  <h2>What's next</h2>
+
+  <p>The agent plays one way, and so far it has only learned to beat a script. Next, we want it to:</p>
+
+  <ul class="next">
+    <li><strong>Play more diverse strategies</strong>, not just one early rush.</li>
+    <li><strong>Keep getting better through self-play</strong>, well past the built-in AI.</li>
+    <li><strong>Play more maps.</strong> Beyond the ladder maps, Warcraft III has thousands of custom maps, the birthplace of whole genres: <a href="https://en.wikipedia.org/wiki/Defense_of_the_Ancients">DotA</a>, which became <a href="https://en.wikipedia.org/wiki/Dota_2">Dota 2</a> and inspired <a href="https://en.wikipedia.org/wiki/League_of_Legends">League of Legends</a>, or the tower-defense map Legion TD, now the standalone <a href="https://legiontd2.com/">Legion TD 2</a>.</li>
+    <li><strong>Scale up compute.</strong> Everything here ran on one desktop.</li>
+  </ul>
+
+  <p>All of this runs on patch 1.29 from 2018. Newer versions of the game, from <a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reforged">Warcraft III: Reforged</a> in 2020 to today's 3.0 with its Definitive Edition graphics, run only through Battle.net, Blizzard's online launcher and copy protection, so we didn't attempt them.</p>
+
+  <p>The research continues, and there will be follow-up posts on how it goes. Until then, the details are in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/overview.md">project's documentation</a>, including Claude's <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> with every run.</p>
+
+  <footer>
+    The code is open source (MIT): <a href="https://github.com/RobinKa/warcraftsim">github.com/RobinKa/warcraftsim</a>. It contains no Blizzard files: to run it you need your own copy of Warcraft III: The Frozen Throne, patch 1.29. This project is not affiliated with or endorsed by Blizzard Entertainment.
+  </footer>
+</main>
+<script>
+  // Videos below the first play only while on screen, so the page loads one video, not all of them.
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
+  }), { threshold: 0.4 });
+  document.querySelectorAll("video[data-autoplay]").forEach(v => io.observe(v));
+</script>
+</body>
+</html>
