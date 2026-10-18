@@ -78,6 +78,14 @@
   .arch text.t { font-weight: 650; font-size: 14px; fill: var(--fg); }
   .arch text.s { font-size: 11.5px; fill: var(--muted); }
   .tip-box { position: absolute; z-index: 5; max-width: 320px; background: var(--fg); color: var(--bg); font: 13.5px/1.5 var(--sans); padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.18); pointer-events: none; }
+  .step { position: relative; border-left: 2px solid var(--faint); margin: 0 0 0 6px; padding: 2px 0 22px 24px; }
+  .step::before { content: ""; position: absolute; left: -7px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+  .step .when { font: 600 12px/1.4 var(--sans); letter-spacing: .07em; text-transform: uppercase; color: var(--accent); }
+  .step h4 { font: 700 19px/1.3 var(--sans); margin: 2px 0 8px; }
+  .step p { margin: 0 0 10px; }
+  .step p b { font-family: var(--sans); font-size: .92em; }
+  figure.mini { margin: 6px 0 14px; }
+  figure.mini svg { display: block; width: 100%; max-width: 440px; height: auto; margin: 0 auto; font-family: var(--sans); }
   .cards.one { grid-template-columns: 1fr; max-width: 640px; margin-left: auto; margin-right: auto; }
   .cards.one svg { max-width: 380px; margin-left: auto; margin-right: auto; }
   h3.chapter { font: 700 22px/1.25 var(--sans); margin: 44px 0 10px; }
@@ -358,7 +366,7 @@
 
   <h2>How it learned</h2>
 
-  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung the story was the same: a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
+  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
@@ -386,11 +394,12 @@
 
   <p>The whole game started on small copies of Echo Isles' main bases, with the rules sped up seven times so that a game took two minutes. The agent began as a copy of the built-in AI, trained to imitate its orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
 
-  <div class="cards one">
-    <div class="card">
-      <div class="where">28 September</div>
-      <h4>A fair opponent <span class="res">0% → 79%</span></h4>
-      <svg viewBox="0 0 300 100" aria-hidden="true">
+  <div class="step">
+    <div class="when">28 September</div>
+    <h4>A fair opponent</h4>
+    <p><b>What was wrong.</b> The first self-play run won none of its last 75 games, so it had nothing to learn from. Two easier opponents were gamed: given extra hit points, the agent never learned to spend, and against an AI that started late, it simply rushed the idle AI.</p>
+    <p><b>The change.</b> The AI plays from the start but loses a share of what it gathers: more after each of the agent's losses, less after each win, so the agent wins about half of those games. The test games never have a tax.</p>
+    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="84" x2="285" y2="84" stroke="var(--faint)" stroke-width="1.5"/>
         <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="20,20 50,26 70,22 95,36 120,44 145,40 170,56 200,64 230,72 260,80 285,83"/>
         <line x1="20" y1="52" x2="285" y2="52" stroke="var(--good)" stroke-width="2" stroke-dasharray="5 4"/>
@@ -399,9 +408,8 @@
           <text x="186" y="46" fill="var(--good)">agent wins ~half</text>
           <text x="285" y="97" text-anchor="end">training →</text>
         </g>
-      </svg>
-      <p><b>Why:</b> the first self-play run won none of its last 75 games, so it had nothing to learn from, and easier opponents got gamed: given extra hit points it never learned to spend, and an AI that started late it simply rushed. <b>The change:</b> the AI loses a share of its income, adjusted so the agent wins about half. Test games have no tax. By 2 October: 79%.</p>
-    </div>
+      </svg></figure>
+    <p><b>The outcome.</b> As the agent improved, the tax fell towards zero. By 2 October it won 79% of its test games against the AI.</p>
   </div>
 
   <figure class="breakout">
@@ -419,9 +427,15 @@
 
   <h3 class="chapter"><span>2 – 14 October</span>Six-minute games, against insane</h3>
 
-  <p>Next came a map with six-minute games and a harder target: the built-in AI on insane. The copy of the AI started over here, and after hours of self-play it still won only 1 of 98 test games against the built-in AI.</p>
+  <p>Next came a map with six-minute games and a harder target: the built-in AI on insane. The copy of the AI started over here.</p>
 
-  <p><strong>3 October: ask the teacher, in the agent's own games.</strong> A copy of the AI only knows the situations the AI gets itself into, and a weaker student soon lands in others. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in the agent's own games: it labelled the order it would give in every state the agent reached. With this advice in half its games, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
+  <div class="step">
+    <div class="when">3 October</div>
+    <h4>Ask the teacher, in the agent's own games</h4>
+    <p><b>What was wrong.</b> After hours of self-play the agent still won only 1 of 98 test games. A copy of the AI only knows the situations the AI gets itself into, and a weaker student soon lands in others.</p>
+    <p><b>The change.</b> As in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in the agent's own games: it labelled the order it would give in every state the agent reached, in half of the training games.</p>
+    <p><b>The outcome.</b> From 1 win in 98 test games to 13 in 50, within fifty minutes.</p>
+  </div>
 
   <figure class="breakout">
     <svg class="diagram" viewBox="0 0 720 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
@@ -478,13 +492,14 @@
     <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, training nudges the agent towards the AI's choice.</figcaption>
   </figure>
 
-  <p>A week and a half of experiments followed, most of them level. Among the ones that moved it:</p>
+  <p>A week and a half of experiments followed, most of them level.</p>
 
-  <div class="cards">
-    <div class="card">
-      <div class="where">13 October</div>
-      <h4>Credit that skips mistakes <span class="res">41% → 73%</span></h4>
-      <svg viewBox="0 0 300 128" aria-hidden="true">
+  <div class="step">
+    <div class="when">13 October</div>
+    <h4>Credit that skips mistakes</h4>
+    <p><b>What was wrong.</b> A game's result is spread back over every action before it, so a good move followed by a lost fight was blamed for the fight.</p>
+    <p><b>The change.</b> AlphaStar's UPGO: credit follows the game only up to the first move that went worse than expected; from there on, the value's estimate stands in.</p>
+    <figure class="mini"><svg viewBox="0 0 300 128" aria-hidden="true">
         <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
         <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--good)"/></marker></defs>
         <g font-size="10.5" fill="var(--muted)"><text x="2" y="42">plain</text><text x="2" y="106">UPGO</text></g>
@@ -500,25 +515,16 @@
           <path d="M150 98 Q 106 76 68 96" fill="none" stroke="var(--good)" stroke-width="1.8" marker-end="url(#ag)"/>
           <text x="210" y="74" font-size="10" fill="var(--accent)" text-anchor="middle">to the mistake</text>
           <text x="102" y="74" font-size="10" fill="var(--good)" text-anchor="middle">good moves not blamed</text></g>
-      </svg>
-      <p><b>Why:</b> a good move followed by a lost fight was blamed for the fight. <b>The change:</b> AlphaStar's UPGO. Credit follows the game only up to the first move that went worse than expected; from there on, the value's estimate stands in.</p>
-    </div>
-    <div class="card">
-      <div class="where">14 October</div>
-      <h4>Stop listening to the teacher <span class="res">51% → 63%</span></h4>
-      <svg viewBox="0 0 300 96" aria-hidden="true">
-        <g font-size="12" text-anchor="middle">
-          <rect x="10" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
-          <rect x="190" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
-          <text x="60" y="51" fill="var(--fg)">built-in AI</text><text x="240" y="51" fill="var(--fg)">agent</text>
-          <line x1="114" y1="46" x2="184" y2="46" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
-          <text x="150" y="38" fill="var(--muted)" font-size="11">advice</text>
-          <path d="M140 54 L160 74 M160 54 L140 74" stroke="var(--accent)" stroke-width="3"/>
-          <text x="240" y="88" fill="var(--muted)" font-size="11">already wins more</text>
-        </g>
-      </svg>
-      <p><b>Why:</b> the agent now beat its teacher, but the teacher's advice still drove most of each update. <b>The change:</b> no more advice, and training ran faster without it.</p>
-    </div>
+      </svg></figure>
+    <p><b>The outcome.</b> 41% → 73% of its test games against insane, over two runs.</p>
+  </div>
+
+  <div class="step">
+    <div class="when">14 October</div>
+    <h4>Stop listening to the teacher</h4>
+    <p><b>What was wrong.</b> The agent now won about 60% against insane: it had overtaken its teacher, yet the teacher's advice still drove most of each update.</p>
+    <p><b>The change.</b> No more advice.</p>
+    <p><b>The outcome.</b> 51% → 63% against insane, and training ran faster without the AI in the games.</p>
   </div>
 
   <figure class="breakout">
@@ -536,11 +542,12 @@
 
   <h3 class="chapter"><span>15 – 17 October</span>The real map</h3>
 
-  <div class="cards one">
-    <div class="card">
-      <div class="where">15 October</div>
-      <h4>See the big map like the small one <span class="res">49% at once</span></h4>
-      <svg viewBox="0 0 300 100" aria-hidden="true">
+  <div class="step">
+    <div class="when">15 October</div>
+    <h4>See the big map like the small one</h4>
+    <p><b>What was wrong.</b> On Echo Isles the agent's buildings landed in the trees, and its attacks went to where the enemy base used to be on the small map: 41 of its first 89 games tied.</p>
+    <p><b>The change.</b> Positions measured from its own base, at the scale it knew, with the enemy base where it expects it.</p>
+    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
         <rect x="10" y="30" width="96" height="44" rx="6" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
         <circle cx="24" cy="52" r="6" fill="var(--good)"/><circle cx="92" cy="52" r="6" fill="var(--accent)"/>
         <rect x="150" y="12" width="140" height="80" rx="6" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
@@ -550,9 +557,8 @@
           <text x="58" y="88" text-anchor="middle">the duel map</text><text x="220" y="56" text-anchor="middle">Echo Isles</text>
           <text x="10" y="22">near its base: the same scale</text>
         </g>
-      </svg>
-      <p><b>Why:</b> on Echo Isles its buildings landed in the trees and its attacks went to where the enemy base used to be: 41 of its first 89 games tied. <b>The change:</b> positions measured from its own base, at the scale it knew. Then 49% under the real rules, straight away.</p>
-    </div>
+      </svg></figure>
+    <p><b>The outcome.</b> Trained on the fast rules on the real map, it then won 49% of its test games under the real rules straight away. From there it climbed:</p>
   </div>
 
   <figure class="chart">
@@ -591,11 +597,12 @@
     </svg>
   </figure>
 
-  <div class="cards">
-    <div class="card">
-      <div class="where">15 October</div>
-      <h4>Look further ahead <span class="res">55% → 59%</span></h4>
-      <svg viewBox="0 0 300 110" aria-hidden="true">
+  <div class="step">
+    <div class="when">15 October</div>
+    <h4>Look further ahead</h4>
+    <p><b>What was wrong.</b> Real games last up to 25 minutes, the small map's six, and the agent looked about eight minutes ahead: whatever paid off later hardly counted.</p>
+    <p><b>The change.</b> A discount of 0.9997 instead of 0.999, about 28 minutes. The chart shows how much a win counts by how far ahead it comes.</p>
+    <figure class="mini"><svg viewBox="0 0 300 110" aria-hidden="true">
         <rect x="116.7" y="12" width="130" height="83" fill="var(--accent-soft)"/>
         <line x1="30" y1="95" x2="290" y2="95" stroke="var(--faint)" stroke-width="1.5"/>
         <polyline fill="none" stroke="var(--muted)" stroke-width="2" points="30,15 47.3,32.1 64.7,45.5 82,56.1 99.3,64.4 116.7,70.9 151.3,80.1 186,85.8 220.7,89.3 255.3,91.5 290,92.8"/>
@@ -606,13 +613,16 @@
           <text x="104" y="62">0.999</text>
           <text x="232" y="52" fill="var(--accent)">0.9997</text>
         </g>
-      </svg>
-      <p><b>Why:</b> real games last up to 25 minutes; the agent looked about 8 ahead. <b>The change:</b> a discount of 0.9997 instead of 0.999, about 28 minutes.</p>
-    </div>
-    <div class="card">
-      <div class="where">16 October</div>
-      <h4>Find room to build <span class="res">57% → 62%</span></h4>
-      <svg viewBox="0 0 300 110" aria-hidden="true">
+      </svg></figure>
+    <p><b>The outcome.</b> 55% → 59%.</p>
+  </div>
+
+  <div class="step">
+    <div class="when">16 October</div>
+    <h4>Find room to build</h4>
+    <p><b>What was wrong.</b> Building spots learned on the flat duel map often missed Echo Isles' trees, cliffs and blight, and the game refused three of four undead buildings.</p>
+    <p><b>The change.</b> When a spot is blocked, the harness searches three times farther for a free one.</p>
+    <figure class="mini"><svg viewBox="0 0 300 110" aria-hidden="true">
         <g fill="var(--muted)" opacity=".45">
           <rect x="128" y="38" width="12" height="12"/><rect x="140" y="38" width="12" height="12"/><rect x="152" y="50" width="12" height="12"/>
           <rect x="128" y="62" width="12" height="12"/><rect x="164" y="62" width="12" height="12"/><rect x="140" y="74" width="12" height="12"/>
@@ -628,13 +638,16 @@
           <text x="204" y="24">tried: 256 units</text><text x="204" y="38" fill="var(--good)">now: 768</text>
           <text x="210" y="96" fill="var(--good)">fits</text>
         </g>
-      </svg>
-      <p><b>Why:</b> spots learned on the flat duel map missed Echo Isles' trees, cliffs and blight; three of four undead buildings were refused. <b>The change:</b> the harness searches three times farther for a free spot.</p>
-    </div>
-    <div class="card">
-      <div class="where">16 October</div>
-      <h4>Half the hint <span class="res">62% → 72%</span></h4>
-      <svg viewBox="0 0 300 100" aria-hidden="true">
+      </svg></figure>
+    <p><b>The outcome.</b> 57% → 62%, once the agent had learned to use it.</p>
+  </div>
+
+  <div class="step">
+    <div class="when">16 October</div>
+    <h4>Half the hint</h4>
+    <p><b>What was wrong.</b> Besides ±1 for the result, the agent is rewarded for gains in material (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>). With the longer horizon the win itself now reached far back, and the material rewards could pull towards trading armies instead of winning.</p>
+    <p><b>The change.</b> Half the weight on material.</p>
+    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="50" x2="240" y2="50" stroke="var(--faint)" stroke-width="1.5"/>
         <polyline fill="none" stroke="var(--muted)" stroke-width="2" points="20,50 50,46 80,40 110,44 140,32 170,36 200,24 230,20"/>
         <g fill="var(--chart-bar-2)">
@@ -647,13 +660,16 @@
           <text x="24" y="14">material lead</text><text x="24" y="96">small rewards: its changes, now ×½</text>
           <text x="271" y="14" text-anchor="middle" fill="var(--accent)">win</text>
         </g>
-      </svg>
-      <p><b>Why:</b> besides ±1 for the result, the agent is rewarded for gains in material (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>), which can pull it towards trading armies instead of winning. <b>The change:</b> half the weight. The weakest races gained most.</p>
-    </div>
-    <div class="card">
-      <div class="where">17 October</div>
-      <h4>A looser anchor <span class="res">74% → 82%</span></h4>
-      <svg viewBox="0 0 300 110" aria-hidden="true">
+      </svg></figure>
+    <p><b>The outcome.</b> 62% → 72%, the weakest races gaining most.</p>
+  </div>
+
+  <div class="step">
+    <div class="when">17 October</div>
+    <h4>A looser anchor</h4>
+    <p><b>What was wrong.</b> Three experiments in a row ended level with where they started. Two forces train the agent: the reward pushes it towards better play, and a KL term pulls it back towards an earlier version of itself, the anchor, for stability. Measured per update, the push was about 1% signal and 99% noise, and the pull was clean.</p>
+    <p><b>The change.</b> A quarter of the pull.</p>
+    <figure class="mini"><svg viewBox="0 0 300 110" aria-hidden="true">
         <rect x="10" y="38" width="70" height="36" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
         <text x="45" y="53" font-size="11" text-anchor="middle" fill="var(--fg)">anchor</text><text x="45" y="66" font-size="9.5" text-anchor="middle" fill="var(--muted)">earlier self</text>
         <path d="M80 56 l8 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l8 -7 l20 0" fill="none" stroke="var(--fg)" stroke-width="1.5"/>
@@ -669,13 +685,16 @@
           <text x="196" y="14">reward: 1% signal</text>
           <text x="232" y="72" fill="var(--good)">better play</text>
         </g>
-      </svg>
-      <p><b>Why:</b> three experiments in a row ended level. The reward's push was about 1% signal and 99% noise, while the KL pull back towards an earlier version of the agent, the anchor, was clean. <b>The change:</b> a quarter of the pull. Ahead after about ninety minutes.</p>
-    </div>
-    <div class="card">
-      <div class="where">17 October</div>
-      <h4>Give it a plan <span class="res">84% → 89%</span></h4>
-      <svg viewBox="0 0 300 100" aria-hidden="true">
+      </svg></figure>
+    <p><b>The outcome.</b> Level for ninety minutes, then ahead: 74% → 82%.</p>
+  </div>
+
+  <div class="step">
+    <div class="when">17 October</div>
+    <h4>Give it a plan</h4>
+    <p><b>What was wrong.</b> The agent played one strategy, an early rush, and its losses were long games without tech.</p>
+    <p><b>The change.</b> As in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the training games come with a target build order and tech path, drawn from 8,072 seen in games of the AI and of people, as an input to the network and with a small reward for following it.</p>
+    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="44" x2="285" y2="44" stroke="var(--faint)" stroke-width="2"/>
         <g font-size="10.5" fill="var(--muted)" text-anchor="middle"><text x="20" y="60">0</text><text x="108" y="60">2</text><text x="197" y="60">4</text><text x="285" y="60">6 min</text></g>
         <g font-size="10.5" text-anchor="middle">
@@ -686,9 +705,8 @@
         </g>
         <text x="20" y="12" font-size="10.5" fill="var(--muted)">a target, for example</text>
         <text x="150" y="88" font-size="11" fill="var(--muted)" text-anchor="middle">→ an input to the network, and a small reward for following it</text>
-      </svg>
-      <p><b>Why:</b> it played one strategy, an early rush, and lost the long games. <b>The change:</b> as in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half the training games come with a target build, from 8,072 games of the AI and of people, plus a small reward for following it.</p>
-    </div>
+      </svg></figure>
+    <p><b>The outcome.</b> 84% → 89%, although it follows the targets only loosely.</p>
   </div>
 
   <figure class="breakout">
