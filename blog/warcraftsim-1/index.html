@@ -177,19 +177,19 @@
 
   <p><a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reign_of_Chaos">Warcraft III</a> is a real-time strategy game from 2002. You gather gold and lumber, build a base, research technology, raise heroes and an army, and destroy your opponent while they do the same. More than twenty years on, people still play it competitively, and streamers such as former pro player <a href="https://www.twitch.tv/grubby">Grubby</a> and the casters of <a href="https://www.twitch.tv/back2warcraft">Back2Warcraft</a> bring it to large audiences.</p>
 
-  <p>This post is about an agent that plays the whole game of Warcraft III on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game's own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>. It now wins about nine games in ten. Here is how it got there, and what was surprising along the way.</p>
+  <p>This post is about an agent that plays the whole game of Warcraft III on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game's own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>, the hardest of its levels (easy, normal and insane). It now wins about nine games in ten. Here is how it got there, and what was surprising along the way.</p>
 
   <h2>Why this is hard</h2>
 
-  <p>A game lasts 10 to 25 minutes, with thousands of decisions for dozens of units at once. There are four races with their own units, buildings and spells, and a fog of war hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind's <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers' help and a datacenter. AlphaStar trained 12 agents for 44 days on 32 TPUs each. I had one desktop and a game that was never built for any of this.</p>
+  <p>A game lasts 10 to 25 minutes, with thousands of decisions for dozens of units at once. There are four races, human, orc, undead and night elf, each with its own units, buildings and spells, and a fog of war hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind's <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers' help and a datacenter. AlphaStar trained 12 agents for 44 days on 32 TPUs each. I had one desktop and a game that was never built for any of this.</p>
 
   <h2>Running the real game, fast</h2>
 
-  <p>Warcraft III has no API for bots, no headless mode and no faster-than-real-time option. It is a 32-bit Windows program, and its rules, pathfinding, spells and AI hold so many details that reimplementing them faithfully would be very hard. So I run the real thing, under <a href="https://www.winehq.org/">Wine</a> on Linux, about fifty copies at once, and drive it from Python.</p>
+  <p>Warcraft III has no API for bots, no headless mode and no faster-than-real-time option. It is a 32-bit Windows program, and its rules, pathfinding, spells and AI hold so many details that reimplementing them faithfully would be very hard. So I run the real thing, under <a href="https://www.winehq.org/">Wine</a> on Linux, about 50 copies at once, and drive it from Python.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Python talks to a DLL inside each game, which talks to a script inside the map">
-      <div class="box hl"><b>Python</b><span>the learner, the inference loop, ~56 games at once</span></div>
+      <div class="box hl"><b>Python</b><span>the learner, the inference loop, ~50 games at once</span></div>
       <div class="arrow" aria-hidden="true">⇄</div>
       <div class="group"><span class="label">one Wine process per game</span>
         <div class="box"><b>w3shim.dll</b><span>a virtual clock; stops the game at every step until Python answers</span></div>
@@ -245,7 +245,7 @@
     </svg>
   </figure>
 
-  <p>Most of the speed came from removing waste, not from adding hardware. The games skip drawing, five games share one map load, the per-unit bookkeeping moved from the game's script into C, and the network runs as CUDA graphs from a C++ loop. Today the desktop plays about 48 games at once, each about 15 times faster than real time, which adds up to roughly <strong>730 hours of Warcraft III every hour</strong>.</p>
+  <p>Most of the speed came from removing waste, not from adding hardware. The games skip drawing, five games share one map load, the per-unit bookkeeping moved from the game's script into C, and the network runs as CUDA graphs from a C++ loop. Today the desktop plays about 50 games at once, each about 15 times faster than real time, which adds up to roughly <strong>730 hours of Warcraft III every hour</strong>.</p>
 
   <h2>The agent</h2>
 
@@ -366,7 +366,7 @@
 
   <p><strong>A head start from the built-in AI.</strong> Learning by playing from scratch is too hard: an agent that gives random orders almost never wins, so it has nothing to learn from. To give it a good start, I recorded thousands of games of the built-in AI playing itself and trained the agent to copy the orders the AI gave. This is called <a href="https://en.wikipedia.org/wiki/Imitation_learning">behavioral cloning</a>, and it leaves the agent playing roughly like the AI.</p>
 
-  <p><strong>Learning from playing.</strong> Once the copying stops improving, the agent switches to self-play. It plays against itself, its past selves and the built-in AI, and learns from the reward. The reward is +1 for a win and −1 for a loss, plus small rewards along the way for gaining material (more on those later). After each batch of games, every order the agent gave is judged by the reward that followed it, using <a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html">policy gradients</a>. If the reward turned out better than the value head expected at that moment, the order becomes a little more likely in that situation; if worse, a little less. The gap between the reward and what was expected is called the <em>advantage</em>.</p>
+  <p><strong>Learning from playing.</strong> Once the copying stops improving, the agent switches to self-play. It plays against a <em>league</em> of opponents (itself, its past selves and the built-in AI) and learns from the reward. The reward is +1 for a win and −1 for a loss, plus small rewards along the way for gaining material (more on those later). After each batch of games, every order the agent gave is judged by the reward that followed it, using <a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html">policy gradients</a>. If the reward turned out better than the value head expected at that moment, the order becomes a little more likely in that situation; if worse, a little less. The gap between the reward and what was expected is called the <em>advantage</em>.</p>
 
   <p><strong>Keeping it steady.</strong> A second term, a <em>KL divergence</em>, pulls the agent back towards an earlier version of itself, the <em>anchor</em>, so one noisy batch cannot undo what already works.</p>
 
@@ -385,7 +385,7 @@
 
   <h2>Measuring progress</h2>
 
-  <p>Training numbers can't tell whether a change made the agent better. The reward includes the small material rewards, not just wins and losses, and the training opponents change all the time, from past versions of the agent to a built-in AI that is made easier or harder as the agent improves. So every training run also plays <em>test games</em> that it never learns from. They are real games against the built-in AI on insane. Each experiment is a new run that starts from the best agent so far, with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
+  <p>Training numbers can't tell whether a change made the agent better. The reward includes the small material rewards, not just wins and losses, and the training opponents change all the time, from past versions of the agent to a built-in AI that is made easier or harder as the agent improves. So every training run also plays <em>test games</em> that it never learns from. They are games against the built-in AI at the hardest level each stage aims at, without any tax or other help for the agent. On the real map that is insane. Each experiment is a new run that starts from the best agent so far, with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. A few hundred games each are enough to see clear differences. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
 
   <figure class="breakout">
     <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
@@ -410,19 +410,19 @@
       <div class="arrow" aria-hidden="true">→</div>
       <div class="box hl"><b>Echo Isles, real rules</b><span>the real game · 49% at once, now 89%</span></div>
     </div>
-    <figcaption>The curriculum. Each stage started from the previous stage's best agent.</figcaption>
+    <figcaption>The curriculum. The two small maps each started again from behavioral cloning of the built-in AI; the real map started from the six-minute map's best agent.</figcaption>
   </figure>
 
   <p>The first stage was small fights: a hero and a few units on each side, over in seconds. This is where the basics were worked out, such as units as tokens, targets as pointers, starting from behavioral cloning of a scripted player, and a league of past selves.</p>
 
   <figure>
     <video src="media/micro.mp4" poster="media/micro-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-    <figcaption>A micro fight at 1.5× speed between a league-trained agent (A, green rings) and its predecessor (B, orange rings), with a Lich and four units a side. A focuses B's Lich first and casts Frost Nova and Frost Armor until its mana runs out. Over 120 games it won 81 to 31. The panel shows each unit's action probabilities.</figcaption>
+    <figcaption>A micro fight at 1.5× speed between a league-trained agent (A, green rings) and its predecessor (B, orange rings), with a Lich and four units a side. A focuses B's Lich first and casts Frost Nova and Frost Armor until its mana runs out. Over 120 games it won 81, lost 31 and drew 8. The panel shows each unit's action probabilities.</figcaption>
   </figure>
 
   <h3 class="chapter"><span>27 September – 2 October</span>Two-minute games</h3>
 
-  <p>The first whole games were played on a small flat map with two bases laid out like Echo Isles' main bases, with the rules sped up seven times, so a game took two minutes. The agent began with behavioral cloning of the built-in AI's orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
+  <p>The first whole games were played on a small flat <em>duel map</em> with two bases laid out like Echo Isles' main bases, with the rules sped up seven times, so a game took two minutes. The agent began with behavioral cloning of the built-in AI's orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
 
   <div class="step">
     <div class="when">28 September</div>
@@ -527,7 +527,7 @@
     </svg>
     <figcaption>On-policy distillation in one of the agent's games. Every half second there are two orders for each unit. The agent's order is carried out, and the order the built-in AI would give is only recorded. Where the two differ, training nudges the agent towards the AI's choice.</figcaption>
   </figure>
-    <p><b>The outcome.</b> Within fifty minutes the agent went from 1 win in 98 test games to 13 in 50, and the training games stopped ending in ties.</p>
+    <p><b>The outcome.</b> Within fifty minutes of training the agent went from 1 win in 98 test games to 13 in 50, and the training games stopped ending in ties.</p>
   </div>
 
 
@@ -556,15 +556,15 @@
           <text x="210" y="74" font-size="10" fill="var(--accent)" text-anchor="middle">to the mistake</text>
           <text x="102" y="74" font-size="10" fill="var(--good)" text-anchor="middle">good moves not blamed</text></g>
       </svg></figure>
-    <p><b>The outcome.</b> Over two runs, its win rate against insane rose by 32 percentage points.</p>
+    <p><b>The outcome.</b> Over two runs, its win rate against insane went up sharply.</p>
   </div>
 
   <div class="step">
     <div class="when">14 October</div>
-    <h4>Turn on-policy distillation off</h4>
+    <h4>Stop on-policy distillation</h4>
     <p><b>What was wrong.</b> The agent now won about 60% of its games against insane, so it had become better than its teacher. Yet copying the AI's orders still made up most of each training update.</p>
-    <p><b>The change.</b> Turn on-policy distillation off.</p>
-    <p><b>The outcome.</b> Its win rate against insane rose by another 12 points, and training ran faster without the AI in the games.</p>
+    <p><b>The change.</b> Stop on-policy distillation.</p>
+    <p><b>The outcome.</b> It won more often against insane, and training ran faster without the AI in the games.</p>
     <figure class="clip">
         <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>14 October.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
@@ -641,7 +641,7 @@
 <rect x="566.4" y="546.0" width="11" height="11" fill="#f2c94c" stroke="#5a4a12"/>
 <text x="584.4" y="556.0" class="ms">gold mine</text>
 <circle cx="673.1999999999999" cy="552.0" r="6" fill="#d64545" stroke="#fff" stroke-width="1.5"/>
-<text x="685.1999999999999" y="556.0" class="ms">creep camp (all 16 here drop items)</text>
+<text x="685.1999999999999" y="556.0" class="ms">creep camp: neutral monsters that guard items</text>
 <rect x="300" y="566.0" width="12" height="12" rx="2" fill="#3b6fd6"/>
 <text x="318" y="576.0" class="ms">tavern, goblin merchant, marketplace, mercenaries</text>
 </g>
@@ -654,7 +654,7 @@
 
   <figure class="chart">
     <p class="title">Games won against the insane AI on Echo Isles</p>
-    <p class="sub">Each bar is the best agent after one change, measured in test games it never trained on. The same agent's win rate can differ by a few points from one batch of test games to the next, so the outcomes below follow this chart: each step starts where the last one ended.</p>
+    <p class="sub">Each bar is the best agent after one change, measured in test games. The outcomes below use the same numbers.</p>
     <svg viewBox="0 0 680 300" role="img" aria-label="Win rate rose from 49 to 89 percent over six steps">
       <g font-family="inherit" font-size="12.5">
         <g stroke="var(--chart-grid)" stroke-width="1">
@@ -667,9 +667,9 @@
         </g>
         <!-- bars: base y=230, 100% = 200px; x centers 103, 206, 309, 412, 515, 618; width 64 -->
         <g fill="var(--chart-bar)">
-          <rect x="71" y="132" width="64" height="98" rx="3" fill="var(--chart-bar-2)"/>
-          <rect x="174" y="112" width="64" height="118" rx="3" fill="var(--chart-bar-2)"/>
-          <rect x="277" y="106" width="64" height="124" rx="3" fill="var(--chart-bar-2)"/>
+          <rect x="71" y="132" width="64" height="98" rx="3"/>
+          <rect x="174" y="112" width="64" height="118" rx="3"/>
+          <rect x="277" y="106" width="64" height="124" rx="3"/>
           <rect x="380" y="86" width="64" height="144" rx="3"/>
           <rect x="483" y="66" width="64" height="164" rx="3"/>
           <rect x="586" y="52" width="64" height="178" rx="3"/>
@@ -679,9 +679,9 @@
           <text x="412" y="78">72%</text><text x="515" y="58">82%</text><text x="618" y="44">89%</text>
         </g>
         <g fill="var(--muted)" text-anchor="middle">
-          <text x="103" y="250">first real games</text><text x="206" y="250">a longer horizon</text><text x="309" y="250">wider building</text>
-          <text x="412" y="250">half the shaping</text><text x="515" y="250">a looser anchor</text><text x="618" y="250">strategies</text>
-          <text x="103" y="266"></text><text x="206" y="266"></text><text x="309" y="266">search</text>
+          <text x="103" y="250">first real games</text><text x="206" y="250">look further</text><text x="309" y="250">find room</text>
+          <text x="412" y="250">halve material</text><text x="515" y="250">a looser anchor</text><text x="618" y="250">give it a plan</text>
+          <text x="206" y="266">ahead</text><text x="309" y="266">to build</text><text x="412" y="266">rewards</text>
           
         </g>
       </g>
@@ -694,7 +694,7 @@
     <p><b>What was wrong.</b> Real games last up to 25 minutes, against six on the small map, but the agent only looked about eight minutes ahead. Anything that paid off later hardly counted.</p>
     <figure class="clip">
         <video src="media/early-echo.mp4" poster="media/early-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-        <figcaption><b>15 October, the first day under the real rules.</b> The agent (orc, blue) loses a 22-minute game to an insane AI (undead, red) that pays a 27% tax, with 9,600 gold and 3,500 lumber it never spent. The last two minutes at 4×.</figcaption>
+        <figcaption><b>15 October, the first day under the real rules.</b> The agent (orc, blue) loses a 22-minute game to an insane AI (undead, red) that pays a 27% tax, while the agent sits on 9,600 gold and 3,500 lumber it never spent. The last two minutes at 4×.</figcaption>
       </figure>
 
     <p><b>The change.</b> The agent values a reward less the further in the future it comes. At every step, half a second, a future reward is multiplied by a number just below 1, the <em>discount</em>. With a discount of 0.999, a win eight minutes away (about 1,000 steps) counts only about a third as much as a win right now, since 0.999<sup>1000</sup> ≈ 0.37. Raising the discount to 0.9997 stretches that to about 28 minutes, so the agent also cares about what happens late in a long game. The chart shows how much a win counts, depending on how far ahead it is.</p>
@@ -756,7 +756,7 @@
   <div class="step">
     <div class="when">16 October</div>
     <h4>Find room to build</h4>
-    <p><b>What was wrong.</b> Building spots learned on the flat duel map often missed Echo Isles' trees, cliffs and blight, and the game refused three of four undead buildings.</p>
+    <p><b>What was wrong.</b> Building spots learned on the flat duel map often landed on Echo Isles' trees, cliffs or blight (the undead build only on their own corrupted ground), and the game refused three of four undead buildings.</p>
     <p><b>The change.</b> Make the harness search three times farther for a free spot whenever the one the agent asked for is blocked.</p>
     <figure class="mini"><svg viewBox="0 0 300 110" aria-hidden="true">
         <g fill="var(--muted)" opacity=".45">
@@ -823,14 +823,14 @@
           <text x="232" y="72" fill="var(--good)">better play</text>
         </g>
       </svg></figure>
-    <p><b>The outcome.</b> No difference for ninety minutes, then it pulled ahead, from 72% to 82%.</p>
+    <p><b>The outcome.</b> No difference for the first ninety minutes of training, then it pulled ahead, from 72% to 82%.</p>
   </div>
 
   <div class="step">
     <div class="when">17 October</div>
     <h4>Give it a plan</h4>
-    <p><b>What was wrong.</b> The agent played one strategy, an early rush, and its losses were long games without tech.</p>
-    <p><b>The change.</b> Give the agent a plan, as in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>. Half of its training games now come with a target build order, taken from one of 8,072 games played by the AI or by people. The target is an input to the network, and the agent gets a small reward for following it.</p>
+    <p><b>What was wrong.</b> The agent played one strategy, an early rush, and its losses were long games in which it never moved up to stronger units.</p>
+    <p><b>The change.</b> Give the agent a plan, as in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>. Half of its training games now come with a target build order: which buildings, units, heroes and upgrades to make, and when. Each one comes from one of 8,072 games played by the AI or by people. The target is an input to the network, and the agent gets a small reward for following it.</p>
     <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="44" x2="285" y2="44" stroke="var(--faint)" stroke-width="2"/>
         <g font-size="10.5" fill="var(--muted)" text-anchor="middle"><text x="20" y="60">0</text><text x="108" y="60">2</text><text x="197" y="60">4</text><text x="285" y="60">6 min</text></g>
@@ -884,7 +884,7 @@
 
   <figure class="breakout">
     <video src="media/late-loss.mp4" poster="media/late-loss-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-    <figcaption>A long loss by its predecessor, from minute 23 at 4× speed. The agent (human, blue) has 67 workers to the AI's 9, five altars, five barracks, a field of farms and 97 footmen as its only unit. The insane AI (undead, red) made ten kinds of unit, among them gargoyles, abominations and frost wyrms, and 18 upgrades to the agent's 2. It wipes out the army, then the base.</figcaption>
+    <figcaption>A long loss by its predecessor, from minute 23 at 4× speed. The agent (human, blue) has 67 workers to the AI's 9, five altars, five barracks and a field of farms, and it trained 97 footmen over the game as its only unit. The insane AI (undead, red) made ten kinds of unit, among them gargoyles, abominations and frost wyrms, and 18 upgrades to the agent's 2. It wipes out the army, then the base.</figcaption>
   </figure>
 
   <p><strong>It neglects heroes.</strong> It raises about one a game, where the built-in AI raises one and a half or more.</p>
@@ -896,7 +896,7 @@
   <p>The agent plays one way, and so far it has only learned to beat a script. Next, I want it to:</p>
 
   <ul class="next">
-    <li><strong>Play more diverse strategies</strong>, not just one early rush, and use more of the game. It hardly creeps, fighting the neutral camps for experience and items. It rarely expands to a second gold mine or builds a shop, and its heroes don't buy or use items. It never hires heroes at the tavern or mercenaries at their camps. Giving it a target build order was a first step, but it still follows those targets only loosely. Even when the target is enforced, it makes only about a third of the target's buildings, units and upgrades.</li>
+    <li><strong>Play more diverse strategies</strong>, not just one early rush, and use more of the game. It hardly creeps, fighting the neutral camps for experience and items. It rarely expands to a second gold mine or builds a shop, and its heroes don't buy or use items. It never hires heroes at the tavern or mercenaries at their camps. Giving it a target build order was a first step, but it still follows those targets only loosely. Even when the target is enforced, so that it can only make the target's items, it makes only about a third of the target's buildings, units and upgrades.</li>
     <li><strong>Keep getting better through self-play</strong>, well past the built-in AI. Playing against itself and its past selves can go in circles, with the agent forgetting how to beat strategies it no longer sees. <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> countered this with a league that also has <em>exploiters</em>: agents trained only to find and punish the main agent's weaknesses, so it has to fix them.</li>
     <li><strong>Play more maps.</strong> Echo Isles is only one of the game's ladder maps. Patch 1.29 alone ships with many more two-player maps, such as Terenas Stand, Tirisfal Glades, Melting Valley, Secret Valley and The Two Rivers, plus four-player classics like Lost Temple, Twisted Meadows and Turtle Rock. Beyond the ladder maps, Warcraft III has thousands of custom maps, the birthplace of whole genres, such as <a href="https://en.wikipedia.org/wiki/Defense_of_the_Ancients">DotA</a>, which became <a href="https://en.wikipedia.org/wiki/Dota_2">Dota 2</a> and inspired <a href="https://en.wikipedia.org/wiki/League_of_Legends">League of Legends</a>, or the tower-defense map Legion TD, now the standalone <a href="https://legiontd2.com/">Legion TD 2</a>.</li>
     <li><strong>Scale up compute.</strong> Everything here ran on one desktop, which played about 11 years of Warcraft III in all, two years a day at full speed. OpenAI Five played about 45,000 years of Dota 2 in ten months, some 250 years a day, on <a href="https://openai.com/index/openai-five-defeats-dota-2-world-champions">800 petaflop/s-days</a> of compute. AlphaStar trained 12 agents for 44 days on 32 TPUs each. And reinforcement learning, like language models, tends to improve predictably with more experience and bigger networks (<a href="https://arxiv.org/abs/2301.13442">scaling laws</a>).</li>
@@ -908,7 +908,7 @@
 
   <h2>Contact</h2>
 
-  <p>Questions, ideas or want to work together? Get in touch, or join the Warcraft 3 AI server on Discord.</p>
+  <p>Have questions or ideas, or want to work together? Get in touch, or join the Warcraft 3 AI server on Discord.</p>
 
   <p class="links contact">
     <a href="mailto:tora@warlock.ai"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 5.5h18v13H3z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m3.5 6 8.5 7 8.5-7"/></svg>tora@warlock.ai</a>
