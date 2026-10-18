@@ -367,7 +367,22 @@
     <figcaption>One network plays one side. Hover over or tap a part to see what it does.</figcaption>
   </figure>
 
-  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The <strong>order head</strong> picks each unit's order: train this, build that, attack, move, cast, or nothing. Given the order, the <strong>target heads</strong> pick what it is aimed at: a pointer picks a unit in view, and a point is chosen as x and then y, so both coordinates belong to the same spot. The <strong>memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view. The <strong>value head</strong> estimates how the game will end; it reads hidden information and only helps training. It starts as a copy of the built-in AI, trained by behavior cloning on the AI's orders in thousands of its games. Then it learns from playing, with reinforcement learning (<a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five), against a league of opponents: itself, its past selves and the built-in AI.</p>
+  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The <strong>order head</strong> picks each unit's order: train this, build that, attack, move, cast, or nothing. Given the order, the <strong>target heads</strong> pick what it is aimed at: a pointer picks a unit in view, and a point is chosen as x and then y, so both coordinates belong to the same spot. The <strong>memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view. The <strong>value head</strong> estimates how the game will end; it reads hidden information and only helps training.</p>
+
+  <p><strong>How it learns from playing.</strong> The agent starts as a copy of the built-in AI, trained by behavior cloning on the AI's orders in thousands of its games. Then it plays: against itself, its past selves and the built-in AI. After each batch of games, every order it gave is judged by what followed. If things went better than the value head expected at that moment, the order becomes a little more likely in that situation; if worse, a little less. That is the <em>policy gradient</em>, and the gap between what happened and what was expected is the <em>advantage</em>. A second term keeps training steady: a <em>KL divergence</em> that pulls the policy back towards an earlier version of itself, the <em>anchor</em>, so one noisy batch cannot undo what already works. (The exact method is <a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five, which also limits how far one update can move.)</p>
+
+  <figure class="breakout">
+    <div class="flow" role="img" aria-label="Play games, judge each order by what followed against the value's estimate, make better orders more likely, while a KL term pulls towards the anchor">
+      <div class="box"><b>Play</b><span>thousands of games against the league</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><b>Judge each order</b><span>what followed, against what the value head expected: the advantage</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box hl"><b>Update</b><span>better than expected: more likely; worse: less likely</span></div>
+      <div class="arrow" aria-hidden="true">⇄</div>
+      <div class="box"><b>KL to the anchor</b><span>a pull back towards an earlier version of itself</span></div>
+    </div>
+    <figcaption>One round of learning from play; training repeats it every few seconds, on the newest games.</figcaption>
+  </figure>
 
   <h2>How it learned</h2>
 
@@ -742,22 +757,22 @@
   <div class="step">
     <div class="when">16 October</div>
     <h4>Half the hint</h4>
-    <p><b>What was wrong.</b> Besides ±1 for the result, the agent is rewarded for gains in material (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>). With the longer horizon the win itself now reached far back, and the material rewards could pull towards trading armies instead of winning.</p>
-    <p><b>The change.</b> Half the weight on material.</p>
-    <figure class="mini"><svg viewBox="0 0 300 100" aria-hidden="true">
-        <line x1="20" y1="50" x2="240" y2="50" stroke="var(--faint)" stroke-width="1.5"/>
-        <polyline fill="none" stroke="var(--muted)" stroke-width="2" points="20,50 50,46 80,40 110,44 140,32 170,36 200,24 230,20"/>
-        <g fill="var(--chart-bar-2)">
-          <rect x="47" y="76" width="6" height="4"/><rect x="77" y="74" width="6" height="6"/><rect x="107" y="80" width="6" height="4"/>
-          <rect x="137" y="70" width="6" height="10"/><rect x="167" y="80" width="6" height="4"/><rect x="197" y="70" width="6" height="10"/><rect x="227" y="76" width="6" height="4"/>
+    <p><b>What was wrong.</b> Besides ±1 for the result, the agent gets small rewards along the way for material: the cost of its living units and buildings against the opponent's. Hints like this can be gamed. Pay a reward for every unit trained, and the agent could train a footman, let it die and train another, collecting reward forever without getting closer to a win. So the reward is the <em>change</em> in the material lead (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>): +135 when the footman, worth 135 gold, is trained, −135 when it dies. A loop pays nothing, and the best play stays the same.</p>
+    <figure class="mini"><svg viewBox="0 0 505 132" aria-hidden="true">
+        <g font-size="11" fill="var(--muted)" text-anchor="middle">
+          <text x="200" y="16">train a footman</text><text x="268" y="16">it dies</text><text x="336" y="16">train another</text><text x="398" y="16">it dies</text><text x="446" y="16">total</text>
         </g>
-        <line x1="20" y1="80" x2="240" y2="80" stroke="var(--faint)" stroke-width="1.5"/>
-        <rect x="262" y="20" width="18" height="60" rx="2" fill="var(--accent)"/>
-        <g font-size="11" fill="var(--muted)">
-          <text x="24" y="14">material lead</text><text x="24" y="96">small rewards: its changes, now ×½</text>
-          <text x="271" y="14" text-anchor="middle" fill="var(--accent)">win</text>
-        </g>
+        <line x1="0" y1="26" x2="505" y2="26" stroke="var(--faint)"/>
+        <text x="0" y="56" font-size="11.5" fill="var(--fg)">a reward per unit trained</text>
+        <g font-size="14" font-weight="700" text-anchor="middle" fill="var(--accent)"><text x="200" y="57">+1</text><text x="268" y="57">0</text><text x="336" y="57">+1</text><text x="398" y="57">0</text><text x="446" y="57">+2 …</text></g>
+        <text x="446" y="72" font-size="10" text-anchor="middle" fill="var(--accent)">and growing</text>
+        <line x1="0" y1="84" x2="505" y2="84" stroke="var(--faint)"/>
+        <text x="0" y="108" font-size="11.5" fill="var(--fg)">the change in material lead</text>
+        <g font-size="14" font-weight="700" text-anchor="middle" fill="var(--good)"><text x="200" y="109">+135</text><text x="268" y="109">−135</text><text x="336" y="109">+135</text><text x="398" y="109">−135</text><text x="446" y="109">0</text></g>
+        <text x="446" y="124" font-size="10" text-anchor="middle" fill="var(--good)">a loop pays nothing</text>
       </svg></figure>
+    <p>Still, the material rewards could pull the agent towards trading armies rather than winning, and with the longer horizon the result itself now reached far back.</p>
+    <p><b>The change.</b> Half the weight on material.</p>
     <p><b>The outcome.</b> 62% → 72%, the weakest races gaining most.</p>
   </div>
 
