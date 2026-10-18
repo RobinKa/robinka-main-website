@@ -264,7 +264,7 @@
 
   <p><strong>The opponent needed a curriculum too.</strong> The first self-play run won none of its last 75 games against the built-in AI. Giving the AI a late start backfired: the agent learned to rush the idle AI. What worked was a tax: the AI loses a share of everything it gathers, more after each of the agent's losses and less after each win, so the agent wins about half of those games and always has something to learn from. The tax fell towards zero as the agent improved. The test games never have a tax: they are always against the AI at full strength.</p>
 
-  <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So in "shadow" games the built-in AI also played the agent's side: the harness recorded each order it gave as a label for that moment, then undid it, and only the agent's own orders took effect. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
+  <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in its own games: it labelled the orders the agent should give, in the states the agent itself reached. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
 
   <figure class="breakout">
     <div class="duo">
