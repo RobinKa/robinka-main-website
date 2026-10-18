@@ -255,6 +255,13 @@
     <figcaption>Each step started from the previous step's best agent.</figcaption>
   </figure>
 
+  <p><strong>Micro fights</strong> came first: small battles of a hero and a few units a side, over in seconds. They are where the pieces were worked out: units as tokens, targets as pointers, starting from a copy of a scripted player, and a league of past selves.</p>
+
+  <figure>
+    <video src="media/micro.mp4" poster="media/micro-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+    <figcaption>A micro fight at 1.5× speed: a league-trained agent (A, green rings) against its predecessor (B, orange rings), a Lich and four units a side. A focuses B's Lich first and casts Frost Nova and Frost Armor until its mana runs out. Over 120 games it won 81 to 31. The panel shows each unit's action probabilities.</figcaption>
+  </figure>
+
   <p><strong>The opponent needed a curriculum too.</strong> The first self-play run won none of its last 75 games against the built-in AI. Giving the AI a late start backfired: the agent learned to rush the idle AI. What worked was a tax: the AI loses a share of everything it gathers, more after each of the agent's losses and less after each win, so the agent wins about half of those games and always has something to learn from. The tax fell towards zero as the agent improved. The test games never have a tax: they are always against the AI at full strength.</p>
 
   <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So in "shadow" games the built-in AI also played the agent's side: the harness recorded each order it gave as a label for that moment, then undid it, and only the agent's own orders took effect. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
@@ -277,7 +284,7 @@
         <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>14 October, the same map.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
       </figure>
-<!-- 15 October clip: added once rendered -->
+<!-- media/early-echo.mp4: added once rendered -->
       <figure>
         <video src="media/now-echo.mp4" poster="media/now-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>18 October, the real game.</b> The agent (night elf, red) destroys the base of the insane AI (human, blue) at full strength, eleven minutes in. The last two minutes at 4×.</figcaption>
