@@ -142,7 +142,7 @@
 <div class="wide">
   <figure>
     <video src="media/montage.mp4" poster="media/montage-poster.jpg" autoplay muted loop playsinline controls></video>
-    <figcaption>Training games against the insane AI, in real time and with sound (unmute in the player). The agent builds up as night elf and human, its orc army fights the human AI's Blood Mage, then three AI bases fall and the agent wins. The panel on the right follows the agent, player A, with its estimate of how the game will end, its reward, both sides' material and resources, the heroes and the orders it gave.</figcaption>
+    <figcaption>Training games against the insane AI, in real time and with sound (unmute in the player). The agent builds up as night elf and human, its orc army fights the human AI's Blood Mage, its undead army raids a human base, and its Archmage's army kills the AI's Paladin. Then two AI bases fall and the agent wins. The panel on the right follows the agent, player A, with its estimate of how the game will end, its reward, both sides' material and resources, the heroes and the orders it gave.</figcaption>
   </figure>
 </div>
 
@@ -324,7 +324,7 @@
         <g class="node head" tabindex="0" data-tip="How the game will end (+1 a win, −1 a loss), from the context plus the privileged information. Training compares what happened with this estimate to decide which actions were better than expected. It never chooses an action, so the hidden information cannot leak into play.">
           <rect x="600" y="310" width="290" height="74" rx="10"/>
           <text x="614" y="336" class="t">Value head</text>
-          <text x="614" y="356" class="s">how the game will end: for training only</text>
+          <text x="614" y="356" class="s">predict game outcome: for training only</text>
         </g>
         <path d="M240 432 H588 V372 H596" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-dasharray="4 3" marker-end="url(#aa)"/>
       </g>
