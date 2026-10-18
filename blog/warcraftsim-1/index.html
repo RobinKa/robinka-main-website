@@ -58,6 +58,15 @@
   .stat b { display: block; font: 750 28px/1.1 var(--sans); color: var(--accent); letter-spacing: -.02em; }
   .stat span { display: block; font: 13.5px/1.4 var(--sans); color: var(--muted); margin-top: 6px; }
   @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0 28px; }
+  .card { background: var(--card); border: 1px solid var(--faint); border-radius: 10px; padding: 14px 16px 16px; }
+  .card .where { font: 600 11px/1.2 var(--sans); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .card h4 { font: 650 16.5px/1.3 var(--sans); margin: 4px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .card .res { font: 700 14px/1.3 var(--sans); color: var(--accent); white-space: nowrap; }
+  .card svg { display: block; width: 100%; height: auto; margin: 10px 0 8px; font-family: var(--sans); }
+  .card p { font: 14.5px/1.55 var(--sans); margin: 0; color: var(--fg); }
+  svg.diagram { display: block; width: 100%; height: auto; font-family: var(--sans); }
+  @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
   ul.next { padding-left: 1.2em; margin: 0 0 1.2em; }
   ul.next li { margin: 0 0 .5em; }
   .note { font: 15px/1.55 var(--sans); background: var(--accent-soft); border-radius: 8px; padding: 12px 14px; margin: 22px 0; }
@@ -267,14 +276,58 @@
   <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in its own games: it labelled the orders the agent should give, in the states the agent itself reached. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
 
   <figure class="breakout">
-    <div class="flow" role="img" aria-label="The agent plays its own game; the built-in AI labels each state the agent reaches with the order it would give; the agent learns from the result and from the labels">
-      <div class="box"><b>The agent plays</b><span>its own game: only its orders take effect</span></div>
-      <div class="arrow" aria-hidden="true">→</div>
-      <div class="box hl"><b>The built-in AI watches</b><span>in every state the agent reaches: the order it would give there</span></div>
-      <div class="arrow" aria-hidden="true">→</div>
-      <div class="box"><b>The agent learns</b><span>from winning or losing, and from imitating those orders</span></div>
-    </div>
-    <figcaption>On-policy distillation: the teacher labels the student's own states, so its advice fits the situations the student actually gets into.</figcaption>
+    <svg class="diagram" viewBox="0 0 720 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
+      <g font-size="13">
+        <g fill="var(--muted)" text-anchor="end" font-size="12.5">
+          <text x="118" y="56">the agent's game</text>
+          <text x="118" y="132">the agent's order</text>
+          <text x="118" y="147" font-size="11">carried out</text>
+          <text x="118" y="206">the AI's order</text>
+          <text x="118" y="221" font-size="11">only a label</text>
+        </g>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker>
+        </defs>
+        <!-- states -->
+        <g fill="var(--card)" stroke="var(--faint)" stroke-width="1.5">
+          <rect x="140" y="30" width="110" height="40" rx="8"/><rect x="285" y="30" width="110" height="40" rx="8"/>
+          <rect x="430" y="30" width="110" height="40" rx="8"/><rect x="575" y="30" width="110" height="40" rx="8"/>
+        </g>
+        <g fill="var(--fg)" text-anchor="middle" font-weight="600">
+          <text x="195" y="55">state 1</text><text x="340" y="55">state 2</text><text x="485" y="55">state 3</text><text x="630" y="55">state 4</text>
+        </g>
+        <g stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)">
+          <line x1="252" y1="50" x2="282" y2="50"/><line x1="397" y1="50" x2="427" y2="50"/><line x1="542" y1="50" x2="572" y2="50"/>
+        </g>
+        <!-- links down -->
+        <g stroke="var(--faint)" stroke-width="1.5">
+          <line x1="195" y1="70" x2="195" y2="117"/><line x1="340" y1="70" x2="340" y2="117"/><line x1="485" y1="70" x2="485" y2="117"/><line x1="630" y1="70" x2="630" y2="117"/>
+        </g>
+        <!-- agent orders -->
+        <g fill="var(--card)" stroke="var(--good)" stroke-width="2">
+          <rect x="140" y="117" width="110" height="34" rx="17"/><rect x="285" y="117" width="110" height="34" rx="17"/>
+          <rect x="430" y="117" width="110" height="34" rx="17"/><rect x="575" y="117" width="110" height="34" rx="17"/>
+        </g>
+        <g fill="var(--fg)" text-anchor="middle">
+          <text x="195" y="139">train a worker</text><text x="340" y="139">attack</text><text x="485" y="139">build a farm</text><text x="630" y="139">attack</text>
+        </g>
+        <!-- comparisons -->
+        <g text-anchor="middle" font-weight="700" font-size="16">
+          <text x="195" y="178" fill="var(--good)">=</text><text x="340" y="178" fill="var(--accent)">≠</text>
+          <text x="485" y="178" fill="var(--good)">=</text><text x="630" y="178" fill="var(--accent)">≠</text>
+        </g>
+        <!-- AI labels -->
+        <g fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4">
+          <rect x="140" y="191" width="110" height="34" rx="17"/><rect x="285" y="191" width="110" height="34" rx="17"/>
+          <rect x="430" y="191" width="110" height="34" rx="17"/><rect x="575" y="191" width="110" height="34" rx="17"/>
+        </g>
+        <g fill="var(--fg)" text-anchor="middle">
+          <text x="195" y="213">train a worker</text><text x="340" y="213">build a farm</text><text x="485" y="213">build a farm</text><text x="630" y="213">train a footman</text>
+        </g>
+        <text x="412" y="258" text-anchor="middle" fill="var(--muted)" font-size="12.5">training: the reward for winning, plus a loss that moves each of the agent's orders towards the AI's label</text>
+      </g>
+    </svg>
+    <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, training nudges the agent towards the AI's choice.</figcaption>
   </figure>
 
   <figure class="breakout">
@@ -295,7 +348,10 @@
         <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>14 October, the same map.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
       </figure>
-<!-- media/early-echo.mp4: added once rendered -->
+      <figure>
+        <video src="media/early-echo.mp4" poster="media/early-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>15 October, the real game.</b> On its first day under the real rules, the agent (orc, blue) loses to an insane AI (undead, red) that pays a 27% tax, after 22 minutes and with 9,600 gold and 3,500 lumber unspent. The last two minutes at 4×.</figcaption>
+      </figure>
       <figure>
         <video src="media/now-echo.mp4" poster="media/now-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>18 October, the real game.</b> The agent (night elf, red) destroys the base of the insane AI (human, blue) at full strength, eleven minutes in. The last two minutes at 4×.</figcaption>
@@ -338,37 +394,173 @@
           <text x="103" y="250">first real games</text><text x="206" y="250">a longer horizon</text><text x="309" y="250">wider building</text>
           <text x="412" y="250">half the shaping</text><text x="515" y="250">a looser anchor</text><text x="618" y="250">strategies</text>
           <text x="103" y="266"></text><text x="206" y="266"></text><text x="309" y="266">search</text>
-          <text x="412" y="266">(see 2)</text><text x="515" y="266">(see 3)</text><text x="618" y="266">(see 4)</text>
+          
         </g>
       </g>
     </svg>
   </figure>
 
-  <p>The first two steps were small fixes: rewards counted further into the future, and a wider search for where a building fits. Four other results surprised us.</p>
+  <p>Every change was one experiment, judged on test games against the insane AI. These helped, in the order they came:</p>
 
-  <div class="twist">
-    <span class="num">1</span>
-    <h3>Imitating the AI stopped helping</h3>
-    <p>Imitation and advice got the agent started, but once it beat its teacher they held it back. Switching the advice off was one of the larger gains on the small maps. On Echo Isles every attempt to mix imitation back in was level or worse, and the stronger doses undid how the agent had learned to fight.</p>
+  <div class="breakout cards">
+
+    <div class="card">
+      <div class="where">6-minute map</div>
+      <h4>Credit that skips mistakes <span class="res">41% → 73%</span></h4>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <line x1="20" y1="58" x2="285" y2="58" stroke="var(--faint)" stroke-width="2"/>
+        <path d="M45 40 Q 72 18 100 40" fill="none" stroke="var(--good)" stroke-width="2"/>
+        <path d="M100 40 Q 127 18 152 40" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle cx="45" cy="58" r="11" fill="var(--good)"/><circle cx="100" cy="58" r="11" fill="var(--good)"/>
+        <circle cx="155" cy="58" r="11" fill="var(--accent)"/><circle cx="210" cy="58" r="11" fill="var(--faint)"/><circle cx="265" cy="58" r="11" fill="var(--faint)"/>
+        <g font-size="11" fill="var(--muted)" text-anchor="middle">
+          <text x="45" y="88">good</text><text x="100" y="88">good</text><text x="155" y="88">mistake</text>
+          <text x="98" y="13">credit from the game</text><text x="232" y="30">from here on: the</text><text x="232" y="43">value's estimate</text>
+        </g>
+      </svg>
+      <p>AlphaStar's UPGO: a good action's credit follows the game only while the actions after it did at least as well as expected. A later mistake no longer drags down the good moves before it.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">6-minute map</div>
+      <h4>Train the network that plays <span class="res">55% → 81%</span></h4>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <g font-size="11.5" text-anchor="middle">
+          <rect x="10" y="8" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+          <rect x="172" y="8" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="69" y="28" fill="var(--fg)">plays: no dropout</text><text x="231" y="28" fill="var(--fg)">learns: dropout</text>
+          <text x="150" y="30" fill="var(--accent)" font-size="18" font-weight="700">≠</text>
+          <rect x="10" y="56" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+          <rect x="172" y="56" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
+          <text x="69" y="76" fill="var(--fg)">plays: no dropout</text><text x="231" y="76" fill="var(--fg)">learns: no dropout</text>
+          <text x="150" y="78" fill="var(--good)" font-size="18" font-weight="700">=</text>
+        </g>
+      </svg>
+      <p>The network played its games without dropout but was trained with it, so every update measured a slightly different network than the one that played. Without dropout in training too: one of the biggest jumps on that map.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">6-minute map</div>
+      <h4>Stop listening to the teacher <span class="res">51% → 63%</span></h4>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <g font-size="12" text-anchor="middle">
+          <rect x="10" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+          <rect x="190" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
+          <text x="60" y="51" fill="var(--fg)">built-in AI</text><text x="240" y="51" fill="var(--fg)">agent</text>
+          <line x1="114" y1="46" x2="184" y2="46" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="150" y="38" fill="var(--muted)" font-size="11">advice</text>
+          <path d="M140 54 L160 74 M160 54 L140 74" stroke="var(--accent)" stroke-width="3"/>
+          <text x="240" y="88" fill="var(--muted)" font-size="11">already wins more</text>
+        </g>
+      </svg>
+      <p>Once the agent beat its teacher, the built-in AI's advice (above) only held it back. Switching it off was a gain, and training ran faster without the AI in the games.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">Real map</div>
+      <h4>Look further ahead <span class="res">55% → 59%</span></h4>
+      <svg viewBox="0 0 300 110" aria-hidden="true">
+        <rect x="116.7" y="12" width="130" height="83" fill="var(--accent-soft)"/>
+        <line x1="30" y1="95" x2="290" y2="95" stroke="var(--faint)" stroke-width="1.5"/>
+        <polyline fill="none" stroke="var(--muted)" stroke-width="2" points="30,15 47.3,32.1 64.7,45.5 82,56.1 99.3,64.4 116.7,70.9 151.3,80.1 186,85.8 220.7,89.3 255.3,91.5 290,92.8"/>
+        <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="30,15 64.7,25.7 99.3,35 134,43.1 168.7,50 203.3,56.1 238,61.3 272.7,65.8 290,67.8"/>
+        <g font-size="10.5" fill="var(--muted)">
+          <text x="30" y="107" text-anchor="middle">0</text><text x="116.7" y="107" text-anchor="middle">10</text><text x="203.3" y="107" text-anchor="middle">20</text><text x="290" y="107" text-anchor="end">30 min</text>
+          <text x="182" y="25" text-anchor="middle">a typical game</text>
+          <text x="104" y="62">0.999</text>
+          <text x="232" y="52" fill="var(--accent)">0.9997</text>
+        </g>
+      </svg>
+      <p>How much a reward counts, by how far ahead it comes. With the old discount (0.999) a win eight minutes away counted about a third. Now that takes 28 minutes, the length of a long game.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">Real map</div>
+      <h4>Find room to build <span class="res">57% → 62%</span></h4>
+      <svg viewBox="0 0 300 110" aria-hidden="true">
+        <g fill="var(--muted)" opacity=".45">
+          <rect x="128" y="38" width="12" height="12"/><rect x="140" y="38" width="12" height="12"/><rect x="152" y="50" width="12" height="12"/>
+          <rect x="128" y="62" width="12" height="12"/><rect x="164" y="62" width="12" height="12"/><rect x="140" y="74" width="12" height="12"/>
+          <rect x="116" y="50" width="12" height="12"/><rect x="164" y="38" width="12" height="12"/><rect x="152" y="26" width="12" height="12"/>
+          <rect x="104" y="62" width="12" height="12"/><rect x="176" y="50" width="12" height="12"/>
+        </g>
+        <circle cx="150" cy="56" r="26" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle cx="150" cy="56" r="48" fill="none" stroke="var(--good)" stroke-width="2"/>
+        <path d="M144 50 L156 62 M156 50 L144 62" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="190" y="74" width="14" height="14" fill="var(--good)"/>
+        <g font-size="11" fill="var(--muted)">
+          <text x="2" y="30">asked-for spot:</text><text x="2" y="44">blocked by trees,</text><text x="2" y="58">cliffs or blight</text>
+          <text x="204" y="24">tried: 256 units</text><text x="204" y="38" fill="var(--good)">now: 768</text>
+          <text x="210" y="96" fill="var(--good)">fits</text>
+        </g>
+      </svg>
+      <p>Building spots the agent learned on the flat duel map often missed Echo Isles' trees, cliffs and blight, and the game refused three of four undead buildings. The harness now looks for a free spot three times farther out.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">Real map</div>
+      <h4>Half the hint <span class="res">62% → 72%</span></h4>
+      <svg viewBox="0 0 300 100" aria-hidden="true">
+        <line x1="20" y1="50" x2="240" y2="50" stroke="var(--faint)" stroke-width="1.5"/>
+        <polyline fill="none" stroke="var(--muted)" stroke-width="2" points="20,50 50,46 80,40 110,44 140,32 170,36 200,24 230,20"/>
+        <g fill="var(--chart-bar-2)">
+          <rect x="47" y="76" width="6" height="4"/><rect x="77" y="74" width="6" height="6"/><rect x="107" y="80" width="6" height="4"/>
+          <rect x="137" y="70" width="6" height="10"/><rect x="167" y="80" width="6" height="4"/><rect x="197" y="70" width="6" height="10"/><rect x="227" y="76" width="6" height="4"/>
+        </g>
+        <line x1="20" y1="80" x2="240" y2="80" stroke="var(--faint)" stroke-width="1.5"/>
+        <rect x="262" y="20" width="18" height="60" rx="2" fill="var(--accent)"/>
+        <g font-size="11" fill="var(--muted)">
+          <text x="24" y="14">material lead</text><text x="24" y="96">small rewards: its changes, now ×½</text>
+          <text x="271" y="14" text-anchor="middle" fill="var(--accent)">win</text>
+        </g>
+      </svg>
+      <p>Besides +1 for a win and −1 for a loss, the agent gets small rewards as its material lead grows or shrinks (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>, which leaves the best play unchanged). At half the weight, the win counts for more.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">Real map</div>
+      <h4>A looser anchor <span class="res">74% → 82%</span></h4>
+      <svg viewBox="0 0 300 110" aria-hidden="true">
+        <rect x="10" y="38" width="70" height="36" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+        <text x="45" y="53" font-size="11" text-anchor="middle" fill="var(--fg)">anchor</text><text x="45" y="66" font-size="9.5" text-anchor="middle" fill="var(--muted)">earlier self</text>
+        <path d="M80 56 l8 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l8 -7 l20 0" fill="none" stroke="var(--fg)" stroke-width="1.5"/>
+        <g stroke="var(--accent)" stroke-width="1.2" opacity=".75">
+          <line x1="164" y1="56" x2="190" y2="30"/><line x1="164" y1="56" x2="200" y2="62"/><line x1="164" y1="56" x2="150" y2="22"/>
+          <line x1="164" y1="56" x2="186" y2="88"/><line x1="164" y1="56" x2="140" y2="92"/><line x1="164" y1="56" x2="198" y2="44"/>
+          <line x1="164" y1="56" x2="172" y2="96"/><line x1="164" y1="56" x2="178" y2="18"/>
+        </g>
+        <line x1="164" y1="56" x2="268" y2="56" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <circle cx="164" cy="56" r="8" fill="var(--good)"/>
+        <g font-size="10.5" fill="var(--muted)">
+          <text x="100" y="86" text-anchor="middle">KL: a clean pull</text>
+          <text x="196" y="14">reward: 1% signal</text>
+          <text x="232" y="72" fill="var(--good)">better play</text>
+        </g>
+      </svg>
+      <p>Two forces train the agent: the reward pushes it towards better play, and a KL term pulls it back towards an earlier version of itself, the anchor, for stability. Per update, the reward's push was about 1% signal and 99% noise, the anchor's pull was clean, and experiments kept ending level. A quarter of the pull let the agent move.</p>
+    </div>
+
+    <div class="card">
+      <div class="where">Real map</div>
+      <h4>Give it a plan <span class="res">84% → 89%</span></h4>
+      <svg viewBox="0 0 300 100" aria-hidden="true">
+        <line x1="20" y1="44" x2="285" y2="44" stroke="var(--faint)" stroke-width="2"/>
+        <g font-size="10.5" fill="var(--muted)" text-anchor="middle"><text x="20" y="60">0</text><text x="108" y="60">2</text><text x="197" y="60">4</text><text x="285" y="60">6 min</text></g>
+        <g font-size="10.5" text-anchor="middle">
+          <rect x="34" y="20" width="56" height="18" rx="9" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="62" y="33" fill="var(--fg)">barracks</text>
+          <rect x="94" y="20" width="40" height="18" rx="9" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="114" y="33" fill="var(--fg)">altar</text>
+          <rect x="138" y="20" width="40" height="18" rx="9" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="158" y="33" fill="var(--fg)">hero</text>
+          <rect x="210" y="20" width="44" height="18" rx="9" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="232" y="33" fill="var(--fg)">tier 2</text>
+        </g>
+        <text x="20" y="12" font-size="10.5" fill="var(--muted)">a target, for example</text>
+        <text x="150" y="88" font-size="11" fill="var(--muted)" text-anchor="middle">→ an input to the network, and a small reward for following it</text>
+      </svg>
+      <p>As in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the training games come with a target build order and tech path, drawn from 8,072 seen in games of the AI and of people. The agent follows the targets only loosely, yet it became a better player.</p>
+    </div>
+
   </div>
 
-  <div class="twist">
-    <span class="num">2</span>
-    <h3>Half the hint, ten points more</h3>
-    <p>Besides +1 for a win and −1 for a loss, the agent gets a small reward for gaining material: the cost of its living units and buildings against the opponent's. This <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a> gives feedback long before the end without changing what the best play is. Halving its weight took the win rate from 62% to 72%: with less credit for material, the agent played more for the win.</p>
-  </div>
-
-  <div class="twist">
-    <span class="num">3</span>
-    <h3>The anchor was holding it back</h3>
-    <p>To keep training stable, the agent is pulled towards an "anchor", an earlier checkpoint of itself. Experiment after experiment ended level. <a href="https://arxiv.org/abs/1812.06162">Measuring the gradient noise</a> showed why: in each update the agent's own learning signal was about 1% signal and 99% noise, while the pull back to the anchor was clean and consistent. A quarter of the pull let the agent move, and after about ninety minutes it pulled ahead: 74% to 82%.</p>
-  </div>
-
-  <div class="twist">
-    <span class="num">4</span>
-    <h3>Giving it a plan</h3>
-    <p>Following <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the agent's training games come with a target strategy, a build order and tech path drawn from 8,072 in the AI's games and in human replays, plus a small reward for following it. It follows the targets only loosely, yet it became a better player: 84% to 89%.</p>
-  </div>
+  <p>And some that didn't help, each one a run in the log: rewarding hero levels, twice the learning rate, a bigger batch, more games for the weakest races, less of the built-in AI among the opponents, mixing imitation back in, an exploiter trained to beat the agent, more reward for following the target, annealing the material reward away, an anchor that moves along with the agent, and capping workers in the material reward.</p>
 
   <p>Here is the agent today, with each of the four races.</p>
 
