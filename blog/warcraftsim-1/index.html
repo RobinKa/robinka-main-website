@@ -246,6 +246,8 @@
 
   <p>Most of the speed came from removing waste, not adding hardware: games draw nothing, five share one load of the map, the per-unit bookkeeping moved from the game's script into C, and the network runs as CUDA graphs from a C++ loop. Today the desktop plays about 48 games at once, each about 15 times faster than real time: roughly <strong>730 hours of Warcraft III every hour</strong>.</p>
 
+  <p>The first experiments, the micro fights, trained with <a href="https://github.com/PufferAI/PufferLib">PufferLib</a>, a reinforcement learning library built for speed: its trainer runs on the GPU and its environments are C code. Each of its environments was a real Warcraft III game behind a bridge to Python. The whole game runs on a trainer of our own, which borrows PufferLib's memory core.</p>
+
   <h2>The agent</h2>
 
   <figure class="breakout arch">
