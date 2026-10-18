@@ -65,6 +65,21 @@
   .cite code { background: none; padding: 0; border-radius: 0; font: inherit; }
   .cite .copy { position: absolute; top: 8px; right: 8px; font: 600 12px/1 var(--sans); padding: 6px 10px; border: 1px solid var(--faint); border-radius: 999px; background: var(--bg); color: var(--muted); cursor: pointer; }
   .cite .copy:hover { color: var(--link); border-color: var(--accent); }
+  .toc { display: none; }
+  @media (min-width: 1460px) {
+    .toc { display: block; position: fixed; top: 96px; left: max(16px, calc(50vw - 540px - 196px)); width: 176px; max-height: calc(100vh - 128px); overflow-y: auto;
+           font: 13.5px/1.4 var(--sans); opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .toc.on { opacity: 1; pointer-events: auto; }
+    .toc p { font: 600 11px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+    .toc ul { list-style: none; margin: 0; padding: 0; }
+    .toc li { margin: 0; }
+    .toc ul ul { margin: 2px 0 4px 10px; padding-left: 8px; border-left: 1px solid var(--faint); font-size: 12.5px; }
+    .toc a { display: block; padding: 4px 0; color: var(--muted); text-decoration: none; }
+    .toc a:hover { color: var(--fg); }
+    .toc a.current { color: var(--accent); font-weight: 600; }
+  }
+  html { scroll-behavior: smooth; }
+  h2[id], h3[id] { scroll-margin-top: 24px; }
   .scroll-hint { display: none; }
   @media (max-width: 640px) {
     .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
@@ -187,6 +202,29 @@
   </figure>
 </div>
 
+<nav class="toc" aria-label="Contents">
+  <p>Contents</p>
+  <ul>
+    <li><a href="#why">Why this is hard</a>
+    </li>
+    <li><a href="#speed">Running the game fast</a>
+    </li>
+    <li><a href="#agent">The agent</a>
+    </li>
+    <li><a href="#measuring">Measuring progress</a>
+    </li>
+    <li><a href="#learned">How it learned</a>
+      <ul><li><a href="#stage-2min">Two-minute games</a></li><li><a href="#stage-6min">Six-minute games</a></li><li><a href="#stage-real">The real map</a></li></ul>
+    </li>
+    <li><a href="#limits">What it can’t do yet</a>
+    </li>
+    <li><a href="#next">What’s next</a>
+    </li>
+    <li><a href="#citation">Citation</a>
+    </li>
+  </ul>
+</nav>
+
 <main class="wrap">
 
   <div class="stats">
@@ -200,11 +238,11 @@
 
   <p>This post is about an agent that plays the whole game of Warcraft III on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game’s own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>, the hardest of its levels (easy, normal and insane). It now wins about nine games in ten. Here is how it got there.</p>
 
-  <h2>Why this is hard</h2>
+  <h2 id="why">Why this is hard</h2>
 
   <p>Most games last 10 to 25 minutes, with thousands of decisions for dozens of units at once. There are four races, human, orc, undead and night elf, each with its own units, buildings and spells, and a fog of war hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind’s <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers’ help and a datacenter. AlphaStar trained 12 agents for 44 days on 32 TPUs each. I had one desktop and a game that was never built for any of this.</p>
 
-  <h2>Running the real game, fast</h2>
+  <h2 id="speed">Running the real game, fast</h2>
 
   <p>Warcraft III has no API for bots, no headless mode and no faster-than-real-time option. It is a 32-bit Windows program, and its rules, pathfinding, spells and AI hold so many details that reimplementing them faithfully would be very hard. So I run the real thing, under <a href="https://www.winehq.org/">Wine</a> on Linux, about 50 copies at once, and drive it from Python.</p>
 
@@ -268,7 +306,7 @@
 
   <p>Most of the speed came from removing waste, not from adding hardware. The games skip drawing, five games share one map load, the per-unit bookkeeping moved from the game’s script into C, and the network runs as CUDA graphs from a C++ loop. Today the desktop plays about 50 games at once, each about 15 times faster than real time, which adds up to roughly <strong>730 hours of Warcraft III every hour</strong>.</p>
 
-  <h2>The agent</h2>
+  <h2 id="agent">The agent</h2>
 
   <figure class="breakout arch">
     <div class="scroll"><svg class="diagram" viewBox="0 0 900 470" role="img" aria-label="The network: unit tokens and a player token go through a transformer; a memory carries a state from step to step; heads choose each unit's order and its target, and a value head estimates the result">
@@ -405,7 +443,7 @@
     <figcaption>One round of learning from play. Training repeats it every few seconds on the newest games.</figcaption>
   </figure>
 
-  <h2>Measuring progress</h2>
+  <h2 id="measuring">Measuring progress</h2>
 
   <p>Training numbers can’t tell whether a change made the agent better. The reward includes the small material rewards, not just wins and losses, and the training opponents change all the time, from past versions of the agent to a built-in AI that is made easier or harder as the agent improves. So every training run also plays <em>test games</em> that it never learns from. They are games against the built-in AI at the hardest level each stage aims at, without any tax or other help for the agent. On the real map that is insane. Each experiment is a new run that starts from the best agent so far, with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. A few hundred games each are enough to see clear differences. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
 
@@ -414,7 +452,7 @@
     <figcaption>The dashboard’s matchup tables show the current best agent (left) and the version before it (right) against the insane AI, race by race, over the same 1,500 test games each.</figcaption>
   </figure>
 
-  <h2>How it learned</h2>
+  <h2 id="learned">How it learned</h2>
 
   <p><strong>The problem.</strong> A real game often lasts 25 minutes, and the agent decides twice a second, for all of its units at once. That is 25 × 60 × 2, about 3,000 decisions per side before the one reward, a win or a loss, arrives. With a single result at the end it is hard to tell which of those decisions mattered, and an agent that loses every game gets nothing to learn from. Even an agent trained by behavioral cloning on the built-in AI’s games on the real map lost all 40 of its test games.</p>
 
@@ -442,7 +480,7 @@
     <figcaption>A micro fight at 1.5× speed between a league-trained agent (A, green rings) and its predecessor (B, orange rings), with a Lich and four units a side. A focuses B’s Lich first and casts Frost Nova and Frost Armor until its mana runs out. Over 120 games it won 81, lost 31 and drew 8. The panel shows each unit’s action probabilities.</figcaption>
   </figure>
 
-  <h3 class="chapter"><span>27 September – 2 October</span>Two-minute games</h3>
+  <h3 class="chapter" id="stage-2min"><span>27 September – 2 October</span>Two-minute games</h3>
 
   <p>The first whole games were played on a small flat <em>duel map</em> with two bases laid out like Echo Isles’ main bases, with the rules sped up seven times, so a game took two minutes. The agent began with behavioral cloning of the built-in AI’s orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
 
@@ -481,7 +519,7 @@
   </div>
 
 
-  <h3 class="chapter"><span>2 – 14 October</span>Six-minute games, against insane</h3>
+  <h3 class="chapter" id="stage-6min"><span>2 – 14 October</span>Six-minute games, against insane</h3>
 
   <p>The next stage had slower rules and a harder opponent, the built-in AI on insane. Against the untaxed AI, games took about six minutes. The agent again started from behavioral cloning, this time of the AI’s games under these rules. The tax kept the training games balanced, but they didn’t teach much. Most of the taxed training games dragged on and ended in a tie at the 20-minute time limit. The agent built more than the taxed AI, but sat on about 4,000 gold and lumber it never spent, and hardly attacked. The tax also hid how slowly the agent started. One minute in, the taxed AI had 7 supply against the agent’s 15, but the untaxed AI had 21 and won the test games in five to seven minutes.</p>
 
@@ -596,7 +634,7 @@
   </div>
 
 
-  <h3 class="chapter"><span>15 – 17 October</span>The real map</h3>
+  <h3 class="chapter" id="stage-real"><span>15 – 17 October</span>The real map</h3>
 
   <p>By 14 October the agent won 80% of its games against insane on the six-minute map, so it moved on to the real map, Echo Isles. The real map is far bigger and busier than the duel map, and a few things had to change for it:</p>
 
@@ -902,7 +940,7 @@
     <figcaption>One won game with each race against the insane AI on Echo Isles, the last two minutes at 4×. As night elf it wins almost every game; human and undead are its weakest races.</figcaption>
   </figure>
 
-  <h2>What it can’t do yet</h2>
+  <h2 id="limits">What it can’t do yet</h2>
 
   <p><strong>It plays one strategy.</strong> It wins with an early rush of cheap units, half of its wins within ten minutes. When the rush fails the game goes long, and almost all of its losses are long games. Across the best agent’s 183 long losses, which lasted 27 minutes on average, it built a big base with 35 workers against the AI’s 16. But it stuck to two or three kinds of cheap unit against the AI’s nine, and researched three upgrades against the AI’s seventeen.</p>
 
@@ -915,7 +953,7 @@
 
   <p><strong>So far, the target was the built-in AI.</strong> Apart from itself and its past selves, the insane AI is the only opponent it has played, and beating it was the whole goal. Good human players beat the insane AI reliably; they are far stronger than anything the agent has faced. A human would likely see the rush coming and hold it off, and the long game that follows is where the agent is weakest.</p>
 
-  <h2>What’s next</h2>
+  <h2 id="next">What’s next</h2>
 
   <p>The agent plays one way, and so far it has only learned to beat a script. Next, I want it to:</p>
 
@@ -932,7 +970,7 @@
 
   <p>The research continues, and I will write follow-up posts as it goes. The <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/overview.md">project’s documentation</a> has the details, and the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> has every run.</p>
 
-  <h2>Citation</h2>
+  <h2 id="citation">Citation</h2>
 
   <p>If you use this work, please cite the project:</p>
 
@@ -967,6 +1005,26 @@
     if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
   }), { threshold: 0.4 });
   document.querySelectorAll("video[data-autoplay]").forEach(v => io.observe(v));
+  // contents in the margin (wide screens): shown once the post starts, the section in view highlighted
+  (() => {
+    const toc = document.querySelector(".toc");
+    if (!toc) return;
+    const links = [...toc.querySelectorAll("a")];
+    const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+    const start = document.querySelector(".stats");
+    const update = () => {
+      toc.classList.toggle("on", start && start.getBoundingClientRect().top < window.innerHeight * 0.3);
+      let cur = null;
+      for (const h of heads) if (h.getBoundingClientRect().top < window.innerHeight * 0.35) cur = h;
+      links.forEach(a => a.classList.toggle("current", cur && a.getAttribute("href") === "#" + cur.id));
+      // a stage is current: its section too
+      if (cur && cur.id.startsWith("stage-")) links.find(a => a.getAttribute("href") === "#learned")?.classList.add("current");
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
+
   // copy the citation
   document.querySelectorAll(".cite .copy").forEach(b => b.addEventListener("click", () => {
     const text = b.parentElement.querySelector("code").textContent;
