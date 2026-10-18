@@ -466,21 +466,21 @@
   <div class="step">
     <div class="when">3 October</div>
     <h4>On-policy distillation from the built-in AI</h4>
-    <p><b>What was wrong.</b> After hours of self-play the agent had won only 1 of 98 test games. Behavioral cloning only shows the agent situations the AI itself gets into. The AI always keeps its buildings busy, so its games almost never show an idle barracks with money to spend, and the agent never learned what to do there.</p>
+    <p><b>What was wrong.</b> After hours of self-play the learning agent had won only 1 of 98 test games. Behavioral cloning only shows the learning agent situations that the built-in AI itself gets into. The built-in AI always keeps its buildings busy, so its games almost never show an idle barracks with money to spend, and the learning agent never learned what to do there.</p>
     <figure class="clip">
         <video src="media/early-duelfast.mp4" poster="media/early-duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>3 October.</b> The agent (undead, blue) loses its base to an insane AI (night elf, red) that even pays a 54% tax. The last two minutes at 4×.</figcaption>
       </figure>
 
-    <p><b>The change.</b> Let the built-in AI coach the agent in half of its training games. The AI watches the agent's own game, notes the order it would give in every situation the agent gets into, and training nudges the agent's orders towards those notes. This is <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>.</p>
+    <p><b>The change.</b> Let the built-in AI coach the learning agent in half of its training games. The built-in AI watches the learning agent's game. In every situation the learning agent gets into, the built-in AI notes the order it would give, and training nudges the learning agent's orders towards those notes. This is <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>.</p>
     <figure class="opd">
-    <svg class="diagram" viewBox="0 0 720 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
+    <svg class="diagram" viewBox="-40 0 760 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
       <g font-size="13">
         <g fill="var(--muted)" text-anchor="end" font-size="12.5">
-          <text x="118" y="56">the agent's game</text>
-          <text x="118" y="132">the agent's order</text>
+          <text x="118" y="56">the learning agent's game</text>
+          <text x="118" y="132">learning agent's order</text>
           <text x="118" y="147" font-size="11">carried out</text>
-          <text x="118" y="206">the AI's order</text>
+          <text x="118" y="206">built-in AI's order</text>
           <text x="118" y="221" font-size="11">only a label</text>
         </g>
         <defs>
@@ -522,12 +522,12 @@
         <g fill="var(--fg)" text-anchor="middle">
           <text x="195" y="213">train a worker</text><text x="340" y="213">build a farm</text><text x="485" y="213">build a farm</text><text x="630" y="213">train a footman</text>
         </g>
-        <text x="412" y="258" text-anchor="middle" fill="var(--muted)" font-size="12.5">training: the reward for winning, plus the distillation loss, which moves each of the agent's orders towards the AI's label</text>
+        <text x="412" y="258" text-anchor="middle" fill="var(--muted)" font-size="12.5">training: reward for winning, plus a loss that moves the learning agent's orders towards the built-in AI's</text>
       </g>
     </svg>
-    <figcaption>On-policy distillation in one of the agent's games. Every half second there are two orders for each unit. The agent's order is carried out, and the order the built-in AI would give is only recorded. Where the two differ, training nudges the agent towards the AI's choice.</figcaption>
+    <figcaption>On-policy distillation in one of the learning agent's games. Every half second there are two orders for each unit. The learning agent's order is carried out. The order the built-in AI would give is only recorded. Where the two differ, training nudges the learning agent towards the built-in AI's choice.</figcaption>
   </figure>
-    <p><b>The outcome.</b> Within fifty minutes of training the agent went from 1 win in 98 test games to 13 in 50, and the training games stopped ending in ties.</p>
+    <p><b>The outcome.</b> Within fifty minutes of training the learning agent went from 1 win in 98 test games to 13 in 50, and the training games stopped ending in ties.</p>
   </div>
 
 
@@ -562,9 +562,9 @@
   <div class="step">
     <div class="when">14 October</div>
     <h4>Stop on-policy distillation</h4>
-    <p><b>What was wrong.</b> The agent now won about 60% of its games against insane, so it had become better than its teacher. Yet copying the AI's orders still made up most of each training update.</p>
+    <p><b>What was wrong.</b> The learning agent now won about 60% of its games against insane, so it had become better than the built-in AI coaching it. Yet copying the built-in AI's orders still made up most of each training update.</p>
     <p><b>The change.</b> Stop on-policy distillation.</p>
-    <p><b>The outcome.</b> It won more often against insane, and training ran faster without the AI in the games.</p>
+    <p><b>The outcome.</b> It won more often against insane, and training ran faster without the built-in AI coaching in the games.</p>
     <figure class="clip">
         <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>14 October.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
