@@ -9,7 +9,7 @@
 <meta property="og:title" content="Claude ran 86 experiments to beat Warcraft III's insane AI">
 <meta property="og:description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research.">
 <meta property="og:url" content="https://warlock.ai/blog/warcraftsim-1/">
-<meta property="og:image" content="https://warlock.ai/blog/warcraftsim-1/media/poster.jpg">
+<meta property="og:image" content="https://warlock.ai/blog/warcraftsim-1/media/montage-poster.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://warlock.ai/blog/warcraftsim-1/">
 <style>
@@ -139,8 +139,8 @@
 
 <div class="wide">
   <figure>
-    <video src="media/clip.mp4" poster="media/poster.jpg" autoplay muted loop playsinline controls></video>
-    <figcaption>A training game at 2× speed in the real game client: the agent (night elf, red) rolls through the insane orc AI's base and kills its Blademaster. The panel shows what the agent was thinking: how it expects the game to end (rising towards +1, a win), its reward, both sides' material and resources, and the orders it gave.</figcaption>
+    <video src="media/montage.mp4" poster="media/montage-poster.jpg" autoplay muted loop playsinline controls></video>
+    <figcaption>Training games against the insane AI, in real time and with sound (unmute in the player): the agent building up as undead, night elf and human, then its orc, human, undead and night elf armies at work.</figcaption>
   </figure>
 </div>
 
@@ -382,7 +382,7 @@
 
   <h2>How it learned</h2>
 
-  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even an agent trained by behavioral cloning on the built-in AI's games on the real map lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
+  <p>A real game lasts up to 25 minutes, and the agent decides twice a second, for all of its units at once: 25 × 60 × 2, about 3,000 decisions per side before the one reward, a win or a loss, arrives. An agent that loses every game has nothing to learn from. Even an agent trained by behavioral cloning on the built-in AI's games on the real map lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
@@ -858,7 +858,7 @@
     <figcaption>A long loss by its predecessor, from minute 23 at 4× speed: the agent (human, blue) has 67 workers to the AI's 9, five altars, five barracks, a field of farms and 97 footmen as its only unit. The insane AI (undead, red) made ten kinds of unit, among them gargoyles, abominations and frost wyrms, and 18 upgrades to the agent's 2. It wipes out the army, then the base.</figcaption>
   </figure>
 
-  <p><strong>It neglects heroes:</strong> about one a game, where the built-in AI raises one and a half or more. In the clip at the top it has none at all.</p>
+  <p><strong>It neglects heroes:</strong> about one a game, where the built-in AI raises one and a half or more.</p>
 
   <p><strong>It has only met the built-in AI.</strong> Good human players beat the insane AI every time; they are far stronger than anything the agent has faced. A human would likely see the rush coming and hold it off, and the long game that follows is where the agent is weakest.</p>
 
