@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude ran 86 experiments to beat Warcraft III's insane AI</title>
-<meta name="description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research.">
+<title>Beating Warcraft III's insane AI on one desktop</title>
+<meta name="description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Claude ran 86 experiments to beat Warcraft III's insane AI">
-<meta property="og:description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research.">
+<meta property="og:title" content="Beating Warcraft III's insane AI on one desktop">
+<meta property="og:description" content="In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against insane, trained by self-play on one desktop.">
 <meta property="og:url" content="https://warlock.ai/blog/warcraftsim-1/">
 <meta property="og:image" content="https://warlock.ai/blog/warcraftsim-1/media/montage-poster.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -133,9 +133,9 @@
 <body>
 
 <header class="wrap">
-  <div class="kicker">Reinforcement learning · Warcraft III · AI research agents</div>
-  <h1>Claude ran 86 experiments to beat Warcraft III's insane AI</h1>
-  <p class="dek">In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against the hardest one, insane, trained by self-play on one desktop. Claude Opus 5.5 wrote the code and ran the research. I mostly pointed the way.</p>
+  <div class="kicker">Reinforcement learning · Warcraft III</div>
+  <h1>Beating Warcraft III's insane AI on one desktop</h1>
+  <p class="dek">In three weeks, an agent that plays the real Warcraft III went from losing to the easy AI to winning about nine games in ten against the hardest one, insane, trained by self-play on one desktop.</p>
   <p class="links"><a href="https://github.com/RobinKa/warcraftsim"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>github.com/RobinKa/warcraftsim</a></p>
 </header>
 
@@ -150,50 +150,18 @@
 
   <div class="stats">
     <div class="stat"><b>85–89%</b><span>of real games won against the insane built-in AI, no handicap</span></div>
-    <div class="stat"><b>86</b><span>experiments, run and judged by Claude Opus 5.5</span></div>
+    <div class="stat"><b>3.2 M</b><span>weights, small enough to play on an ordinary CPU</span></div>
     <div class="stat"><b>11 years</b><span>of Warcraft III played in training, in 840,000 games</span></div>
     <div class="stat"><b>1 GPU</b><span>an RTX 3090 and 16 CPU cores</span></div>
   </div>
 
   <p><a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reign_of_Chaos">Warcraft III</a> is a real-time strategy game from 2002. You gather gold and lumber, build a base, research technology, raise heroes and an army, and destroy your opponent while they do the same. More than twenty years on, people still play it competitively, and streamers such as former pro player <a href="https://www.twitch.tv/grubby">Grubby</a> and the casters of <a href="https://www.twitch.tv/back2warcraft">Back2Warcraft</a> bring it to large audiences.</p>
 
-  <p>This post is about two AIs. The first plays the whole game of Warcraft III on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game's own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>. It now wins about nine games in ten. The second built the first. Claude Opus 5.5, working as a coding agent in <a href="https://claude.com/product/claude-code">Claude Code</a>, wrote the code and ran the research. It launched every experiment, watched it, judged it and chose the next one. My part was mostly to say where to go.</p>
-
-  <p>Loops like this are catching on. Andrej Karpathy's <a href="https://github.com/karpathy/autoresearch">autoresearch</a> lets an agent tune a small language model's training on its own, about a hundred five-minute experiments overnight on one GPU. NVIDIA's <a href="https://research.nvidia.com/labs/gear/enpire/">ENPIRE</a> has coding agents improve robot policies on real robots, resetting the scene, running the policy, checking the result and trying something better, until policies for five tasks, from inserting pins to cutting zip ties, succeed 99% of the time within eight tries. Artem Lukoianov pointed <a href="https://www.linkedin.com/posts/artem-lukoianov_i-ran-autolab-over-the-weekend-and-woke-up-activity-7516841834422173696-cEYB">AutoLab</a>, an agent harness for problems with checkable answers, at GPU MODE's CUDA kernel competitions over a weekend. In 22 hours it ran 1,070 experiments and took him to first place on each leaderboard, though he had never written a kernel himself. This project runs the same kind of loop on a slower problem, weeks of reinforcement learning in a real game.</p>
+  <p>This post is about an agent that plays the whole game of Warcraft III on the classic ladder map <a href="https://liquipedia.net/warcraft/Echo_Isles">Echo Isles</a>, under the game's own rules, against the strongest opponent the game ships with, the built-in AI on <em>insane</em>. It now wins about nine games in ten. Here is how it got there, and what surprised us on the way.</p>
 
   <h2>Why this is hard</h2>
 
-  <p>A game lasts 10 to 25 minutes, with thousands of decisions for dozens of units at once. There are four races with their own units, buildings and spells, and a fog of war hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind's <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers' help and a datacenter. AlphaStar trained 12 agents for 44 days on 32 TPUs each. We had one desktop, a game that was never built for any of this, and an AI that runs experiments.</p>
-
-  <h2>An AI runs the lab</h2>
-
-  <p>Claude worked in a loop. Every experiment was a new training run that started from the best agent so far, with one change, such as a reward weight, a new input or a different mix of opponents. Every half hour it checked that the run was alive, fast and free of errors, and compared the new version with the one it started from. Once each had played about 300 test games, Claude called the result, wrote it into the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> and started the next run.</p>
-
-  <figure class="breakout">
-    <div class="flow" role="img" aria-label="I set the goal; Claude picks a change, starts a run, checks it every half hour, judges it on test games and writes it up, then starts again">
-      <div class="box"><b>Me</b><span>the goal and the direction</span></div>
-      <div class="arrow" aria-hidden="true">→</div>
-      <div class="group"><span class="label">Claude Opus 5.5</span>
-        <div class="box"><b>Pick a change</b><span>from the log, the data and papers</span></div>
-        <div class="box"><b>Start a run</b><span>from the best agent, one change</span></div>
-        <div class="box hl"><b>Check every 30 min</b><span>health, speed, new against old</span></div>
-        <div class="box"><b>Judge and write up</b><span>~300 test games each, then the log</span></div>
-      </div>
-      <div class="arrow" aria-hidden="true">↺</div>
-    </div>
-    <figcaption>The research loop. Each experiment takes about two hours.</figcaption>
-  </figure>
-
-  <p><strong>Measuring progress.</strong> For any of this to work, Claude needs a reliable way to tell whether an experiment made the agent better. Training numbers don't answer that. The reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI whose handicap moves. So every run also plays <em>test games</em>, which it never trains on. They are the real game against the built-in AI on insane at full strength. The new version and the one it started from play exactly the same matchups, the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. The dashboard below is what Claude reads at every check.</p>
-
-  <figure class="breakout">
-    <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
-    <figcaption>The dashboard's matchup tables show the current best agent (left) and the version before it (right) against the insane AI, race by race, over the same 1,500 test games each.</figcaption>
-  </figure>
-
-  <p>In about three and a half weeks, Claude co-wrote 496 of the project's 497 commits, with some 30,000 lines of Python plus the C of a DLL that runs inside the game, the game-script harness and a C++ inference loop. It ran 86 whole-game experiments and kept a lab notebook of them, along with notes it reads back at the start of every new session. Most experiments fail. Of the 21 on the real map so far, five were gains; the rest were level or worse, and the log keeps every one with its numbers.</p>
-
-  <p>My part was to set the direction, such as beating insane on the real map, trying AlphaStar's ideas, finding out what limits learning and keeping the experiments bold. And now and then a correction, when it changed more in a run than I had asked for.</p>
+  <p>A game lasts 10 to 25 minutes, with thousands of decisions for dozens of units at once. There are four races with their own units, buildings and spells, and a fog of war hides the opponent. The one real reward, a win or a loss, comes at the very end. DeepMind's <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a> (StarCraft II) and <a href="https://arxiv.org/abs/1912.06680">OpenAI Five</a> (Dota 2) mastered games like this in 2019 and beat top human players, with the game makers' help and a datacenter. AlphaStar trained 12 agents for 44 days on 32 TPUs each. We had one desktop and a game that was never built for any of this.</p>
 
   <h2>Running the real game, fast</h2>
 
@@ -380,6 +348,15 @@
       <div class="box"><b>KL to the anchor</b><span>a pull back towards an earlier version of itself</span></div>
     </div>
     <figcaption>One round of learning from play; training repeats it every few seconds, on the newest games.</figcaption>
+  </figure>
+
+  <h2>Measuring progress</h2>
+
+  <p>Training numbers can't tell whether a change made the agent better. The reward includes hints, and the training opponents change all the time, from past versions of the agent to a built-in AI whose handicap moves. So every training run also plays <em>test games</em> that it never trains on, the real game against the built-in AI on insane at full strength. Each experiment is a new run that starts from the best agent so far with one change. The new version and the one it started from play exactly the same matchups, with the same races and sides, so their win rates can be compared directly. After about 300 games each, a difference of five points stands out from the noise. Every experiment, with its numbers, is in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a>.</p>
+
+  <figure class="breakout">
+    <img class="shot" src="media/matchups.png" alt="Matchup tables: win rates by the agent's race and its opponent's" loading="lazy">
+    <figcaption>The dashboard's matchup tables show the current best agent (left) and the version before it (right) against the insane AI, race by race, over the same 1,500 test games each.</figcaption>
   </figure>
 
   <h2>How it learned</h2>
@@ -882,7 +859,7 @@
 
   <p>All of this runs on patch 1.29 from 2018. Newer versions of the game, from <a href="https://en.wikipedia.org/wiki/Warcraft_III:_Reforged">Warcraft III: Reforged</a> in 2020 to today's 3.0 with its Definitive Edition graphics, run only through Battle.net, Blizzard's online launcher and copy protection, so we didn't attempt them.</p>
 
-  <p>The research continues, and there will be follow-up posts on how it goes. Until then, the details are in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/overview.md">project's documentation</a>, including Claude's <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> with every run.</p>
+  <p>The research continues, and there will be follow-up posts on how it goes. Until then, the details are in the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/overview.md">project's documentation</a>, including the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> with every run.</p>
 
   <footer>
     The code is open source (MIT): <a href="https://github.com/RobinKa/warcraftsim">github.com/RobinKa/warcraftsim</a>. It contains no Blizzard files: to run it you need your own copy of Warcraft III: The Frozen Throne, patch 1.29. This project is not affiliated with or endorsed by Blizzard Entertainment.
