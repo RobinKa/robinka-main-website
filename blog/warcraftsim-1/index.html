@@ -66,6 +66,10 @@
   .card svg { display: block; width: 100%; height: auto; margin: 10px 0 8px; font-family: var(--sans); }
   .card p { font: 14.5px/1.55 var(--sans); margin: 0; color: var(--fg); }
   svg.diagram { display: block; width: 100%; height: auto; font-family: var(--sans); }
+  .cards.one { grid-template-columns: 1fr; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .cards.one svg { max-width: 380px; margin-left: auto; margin-right: auto; }
+  h3.chapter { font: 700 22px/1.25 var(--sans); margin: 44px 0 10px; }
+  h3.chapter span { display: block; font: 600 12px/1.4 var(--sans); letter-spacing: .07em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
   @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
   ul.next { padding-left: 1.2em; margin: 0 0 1.2em; }
   ul.next li { margin: 0 0 .5em; }
@@ -247,9 +251,9 @@
 
   <p>The agent sees only what its player sees, through the fog of war, and every half second it gives each of its units an order: train this, build that there, attack that unit, move here. It has no screen and no mouse. It starts as a copy of the built-in AI, trained to imitate the AI's orders in thousands of its games. Then it learns from playing, with reinforcement learning (<a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five), against a league of opponents: itself, its past selves and the built-in AI.</p>
 
-  <h2>Watching it learn</h2>
+  <h2>How it learned</h2>
 
-  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing.</p>
+  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung the story was the same: a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
@@ -273,9 +277,46 @@
     <figcaption>A micro fight at 1.5× speed: a league-trained agent (A, green rings) against its predecessor (B, orange rings), a Lich and four units a side. A focuses B's Lich first and casts Frost Nova and Frost Armor until its mana runs out. Over 120 games it won 81 to 31. The panel shows each unit's action probabilities.</figcaption>
   </figure>
 
-  <p><strong>The opponent needed a curriculum too.</strong> The first self-play run won none of its last 75 games against the built-in AI. Giving the AI a late start backfired: the agent learned to rush the idle AI. What worked was a tax: the AI loses a share of everything it gathers, more after each of the agent's losses and less after each win, so the agent wins about half of those games and always has something to learn from. The tax fell towards zero as the agent improved. The test games never have a tax: they are always against the AI at full strength.</p>
+  <h3 class="chapter"><span>27 September – 2 October</span>Two-minute games</h3>
 
-  <p><strong>The teacher looked over the student's shoulder.</strong> A copy of the AI only knows the situations the AI gets itself into. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in its own games: it labelled the orders the agent should give, in the states the agent itself reached. With this advice in half its games on the six-minute map, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
+  <p>The whole game started on small copies of Echo Isles' main bases, with the rules sped up seven times so that a game took two minutes. The agent began as a copy of the built-in AI, trained to imitate its orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
+
+  <div class="cards one">
+    <div class="card">
+      <div class="where">28 September</div>
+      <h4>A fair opponent <span class="res">0% → 79%</span></h4>
+      <svg viewBox="0 0 300 100" aria-hidden="true">
+        <line x1="20" y1="84" x2="285" y2="84" stroke="var(--faint)" stroke-width="1.5"/>
+        <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="20,20 50,26 70,22 95,36 120,44 145,40 170,56 200,64 230,72 260,80 285,83"/>
+        <line x1="20" y1="52" x2="285" y2="52" stroke="var(--good)" stroke-width="2" stroke-dasharray="5 4"/>
+        <g font-size="11" fill="var(--muted)">
+          <text x="24" y="14" fill="var(--accent)">the AI's tax: a share of its income taken</text>
+          <text x="186" y="46" fill="var(--good)">agent wins ~half</text>
+          <text x="285" y="97" text-anchor="end">training →</text>
+        </g>
+      </svg>
+      <p><b>Why:</b> the first self-play run won none of its last 75 games against the AI, so the AI had to become beatable, and two easy ways backfired. With twice the hit points the agent never learned to spend; against an AI that started late it simply rushed the idle AI. <b>The change:</b> the AI plays from the start but loses a share of its income: more after each of the agent's losses, less after each win, so the agent always wins about half and has something to learn from. The test games never have a tax. By 2 October the agent won 79% of its test games against the AI.</p>
+    </div>
+  </div>
+
+  <figure class="breakout">
+    <div class="duo">
+      <figure>
+        <video src="media/early-duelrush.mp4" poster="media/early-duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>27 September, the 2-minute map.</b> The copy of the built-in AI on its first day of self-play (orc, blue) loses to the <em>easy</em> AI in 84 seconds. 3× speed.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/duelrush.mp4" poster="media/duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>2 October, the same map.</b> The agent (night elf, red) beats the normal AI (orc, blue) in two minutes. 4× speed.</figcaption>
+      </figure>
+    </div>
+  </figure>
+
+  <h3 class="chapter"><span>2 – 14 October</span>Six-minute games, against insane</h3>
+
+  <p>Next came a map with six-minute games and a harder target: the built-in AI on insane. The copy of the AI started over here, and after hours of self-play it still won only 1 of 98 test games against the built-in AI.</p>
+
+  <p><strong>3 October: ask the teacher, in the agent's own games.</strong> A copy of the AI only knows the situations the AI gets itself into, and a weaker student soon lands in others. So, as in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in the agent's own games: it labelled the order it would give in every state the agent reached. With this advice in half its games, the agent went from 1 win in 98 test games to 13 in 50 within fifty minutes.</p>
 
   <figure class="breakout">
     <svg class="diagram" viewBox="0 0 720 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
@@ -332,16 +373,45 @@
     <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, training nudges the agent towards the AI's choice.</figcaption>
   </figure>
 
+  <p>A week and a half of experiments followed, most of them level. Among the ones that moved it:</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="where">13 October</div>
+      <h4>Credit that skips mistakes <span class="res">41% → 73%</span></h4>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <line x1="20" y1="58" x2="285" y2="58" stroke="var(--faint)" stroke-width="2"/>
+        <path d="M45 40 Q 72 18 100 40" fill="none" stroke="var(--good)" stroke-width="2"/>
+        <path d="M100 40 Q 127 18 152 40" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle cx="45" cy="58" r="11" fill="var(--good)"/><circle cx="100" cy="58" r="11" fill="var(--good)"/>
+        <circle cx="155" cy="58" r="11" fill="var(--accent)"/><circle cx="210" cy="58" r="11" fill="var(--faint)"/><circle cx="265" cy="58" r="11" fill="var(--faint)"/>
+        <g font-size="11" fill="var(--muted)" text-anchor="middle">
+          <text x="45" y="88">good</text><text x="100" y="88">good</text><text x="155" y="88">mistake</text>
+          <text x="98" y="13">credit from the game</text><text x="232" y="30">from here on: the</text><text x="232" y="43">value's estimate</text>
+        </g>
+      </svg>
+      <p><b>Why:</b> a game's result is spread back over every action that led to it, so a good move followed by a lost fight was blamed for the fight. <b>The change:</b> AlphaStar's UPGO, where a good action's credit follows the game only while the actions after it did at least as well as expected.</p>
+    </div>
+    <div class="card">
+      <div class="where">14 October</div>
+      <h4>Stop listening to the teacher <span class="res">51% → 63%</span></h4>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <g font-size="12" text-anchor="middle">
+          <rect x="10" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+          <rect x="190" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
+          <text x="60" y="51" fill="var(--fg)">built-in AI</text><text x="240" y="51" fill="var(--fg)">agent</text>
+          <line x1="114" y1="46" x2="184" y2="46" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="150" y="38" fill="var(--muted)" font-size="11">advice</text>
+          <path d="M140 54 L160 74 M160 54 L140 74" stroke="var(--accent)" stroke-width="3"/>
+          <text x="240" y="88" fill="var(--muted)" font-size="11">already wins more</text>
+        </g>
+      </svg>
+      <p><b>Why:</b> by now the agent won about 60% of its games against insane, so the teacher was weaker than the student, and its advice was still most of what each update changed. <b>The change:</b> no more advice. Training also ran faster without the AI in the games.</p>
+    </div>
+  </div>
+
   <figure class="breakout">
     <div class="duo">
-      <figure>
-        <video src="media/early-duelrush.mp4" poster="media/early-duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-        <figcaption><b>27 September, the 2-minute map.</b> The copy of the built-in AI on its first day of self-play (orc, blue) loses to the <em>easy</em> AI in 84 seconds. 3× speed.</figcaption>
-      </figure>
-      <figure>
-        <video src="media/duelrush.mp4" poster="media/duelrush-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-        <figcaption><b>2 October, the same map.</b> The agent (night elf, red) beats the normal AI (orc, blue) in two minutes. 4× speed.</figcaption>
-      </figure>
       <figure>
         <video src="media/early-duelfast.mp4" poster="media/early-duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>3 October, the 6-minute map.</b> The agent (undead, blue) loses its base to an insane AI (night elf, red) that loses 54% of its income to the tax. The last two minutes at 4×.</figcaption>
@@ -350,21 +420,29 @@
         <video src="media/duelfast.mp4" poster="media/duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>14 October, the same map.</b> The agent (orc, blue) breaks the insane AI (human, red) at full strength. 4× speed.</figcaption>
       </figure>
-      <figure>
-        <video src="media/early-echo.mp4" poster="media/early-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-        <figcaption><b>15 October, the real game.</b> On its first day under the real rules, the agent (orc, blue) loses to an insane AI (undead, red) that pays a 27% tax, after 22 minutes and with 9,600 gold and 3,500 lumber unspent. The last two minutes at 4×.</figcaption>
-      </figure>
-      <figure>
-        <video src="media/now-echo.mp4" poster="media/now-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
-        <figcaption><b>18 October, the real game.</b> The agent (night elf, red) destroys the base of the insane AI (human, blue) at full strength, eleven minutes in. The last two minutes at 4×.</figcaption>
-      </figure>
     </div>
-    <figcaption>Then and now, at each rung of the ladder. The videos have sound: unmute them in the player.</figcaption>
   </figure>
 
-  <p>Moving to the bigger map needed one change in how the agent sees positions: measured from its own base, at the scale it already knew. After that, the agent trained on the fast rules won 49% of its test games under the real rules straight away.</p>
+  <h3 class="chapter"><span>15 – 17 October</span>The real map</h3>
 
-  <h2>What moved the needle</h2>
+  <div class="cards one">
+    <div class="card">
+      <div class="where">15 October</div>
+      <h4>See the big map like the small one <span class="res">49% at once</span></h4>
+      <svg viewBox="0 0 300 100" aria-hidden="true">
+        <rect x="10" y="30" width="96" height="44" rx="6" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+        <circle cx="24" cy="52" r="6" fill="var(--good)"/><circle cx="92" cy="52" r="6" fill="var(--accent)"/>
+        <rect x="150" y="12" width="140" height="80" rx="6" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
+        <circle cx="164" cy="80" r="6" fill="var(--good)"/><circle cx="276" cy="24" r="6" fill="var(--accent)"/>
+        <line x1="112" y1="52" x2="144" y2="52" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <g font-size="10.5" fill="var(--muted)">
+          <text x="58" y="88" text-anchor="middle">the duel map</text><text x="220" y="56" text-anchor="middle">Echo Isles</text>
+          <text x="10" y="22">near its base: the same scale</text>
+        </g>
+      </svg>
+      <p><b>Why:</b> on Echo Isles the agent's buildings landed 2.3 times too far out, in the trees, and its attacks went to where the enemy base used to be on the small map: 41 of its first 89 games ended in a tie. <b>The change:</b> positions measured from its own base at the scale it knew, with the enemy base where it expects it. Trained on fast rules on the real map, it then won 49% of its test games under the real rules straight away.</p>
+    </div>
+  </div>
 
   <figure class="chart">
     <p class="title">The real game on Echo Isles: games won against the insane AI</p>
@@ -402,64 +480,9 @@
     </svg>
   </figure>
 
-  <p>Every change was one experiment, judged on test games against the insane AI. These helped, in the order they came:</p>
-
-  <div class="breakout cards">
-
+  <div class="cards">
     <div class="card">
-      <div class="where">6-minute map</div>
-      <h4>Credit that skips mistakes <span class="res">41% → 73%</span></h4>
-      <svg viewBox="0 0 300 96" aria-hidden="true">
-        <line x1="20" y1="58" x2="285" y2="58" stroke="var(--faint)" stroke-width="2"/>
-        <path d="M45 40 Q 72 18 100 40" fill="none" stroke="var(--good)" stroke-width="2"/>
-        <path d="M100 40 Q 127 18 152 40" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4 3"/>
-        <circle cx="45" cy="58" r="11" fill="var(--good)"/><circle cx="100" cy="58" r="11" fill="var(--good)"/>
-        <circle cx="155" cy="58" r="11" fill="var(--accent)"/><circle cx="210" cy="58" r="11" fill="var(--faint)"/><circle cx="265" cy="58" r="11" fill="var(--faint)"/>
-        <g font-size="11" fill="var(--muted)" text-anchor="middle">
-          <text x="45" y="88">good</text><text x="100" y="88">good</text><text x="155" y="88">mistake</text>
-          <text x="98" y="13">credit from the game</text><text x="232" y="30">from here on: the</text><text x="232" y="43">value's estimate</text>
-        </g>
-      </svg>
-      <p>AlphaStar's UPGO: a good action's credit follows the game only while the actions after it did at least as well as expected. A later mistake no longer drags down the good moves before it.</p>
-    </div>
-
-    <div class="card">
-      <div class="where">6-minute map</div>
-      <h4>Train the network that plays <span class="res">55% → 81%</span></h4>
-      <svg viewBox="0 0 300 96" aria-hidden="true">
-        <g font-size="11.5" text-anchor="middle">
-          <rect x="10" y="8" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
-          <rect x="172" y="8" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
-          <text x="69" y="28" fill="var(--fg)">plays: no dropout</text><text x="231" y="28" fill="var(--fg)">learns: dropout</text>
-          <text x="150" y="30" fill="var(--accent)" font-size="18" font-weight="700">≠</text>
-          <rect x="10" y="56" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
-          <rect x="172" y="56" width="118" height="32" rx="7" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
-          <text x="69" y="76" fill="var(--fg)">plays: no dropout</text><text x="231" y="76" fill="var(--fg)">learns: no dropout</text>
-          <text x="150" y="78" fill="var(--good)" font-size="18" font-weight="700">=</text>
-        </g>
-      </svg>
-      <p>The network played its games without dropout but was trained with it, so every update measured a slightly different network than the one that played. Without dropout in training too: one of the biggest jumps on that map.</p>
-    </div>
-
-    <div class="card">
-      <div class="where">6-minute map</div>
-      <h4>Stop listening to the teacher <span class="res">51% → 63%</span></h4>
-      <svg viewBox="0 0 300 96" aria-hidden="true">
-        <g font-size="12" text-anchor="middle">
-          <rect x="10" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
-          <rect x="190" y="26" width="100" height="40" rx="8" fill="var(--card)" stroke="var(--good)" stroke-width="2"/>
-          <text x="60" y="51" fill="var(--fg)">built-in AI</text><text x="240" y="51" fill="var(--fg)">agent</text>
-          <line x1="114" y1="46" x2="184" y2="46" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
-          <text x="150" y="38" fill="var(--muted)" font-size="11">advice</text>
-          <path d="M140 54 L160 74 M160 54 L140 74" stroke="var(--accent)" stroke-width="3"/>
-          <text x="240" y="88" fill="var(--muted)" font-size="11">already wins more</text>
-        </g>
-      </svg>
-      <p>Once the agent beat its teacher, the built-in AI's advice (above) only held it back. Switching it off was a gain, and training ran faster without the AI in the games.</p>
-    </div>
-
-    <div class="card">
-      <div class="where">Real map</div>
+      <div class="where">15 October</div>
       <h4>Look further ahead <span class="res">55% → 59%</span></h4>
       <svg viewBox="0 0 300 110" aria-hidden="true">
         <rect x="116.7" y="12" width="130" height="83" fill="var(--accent-soft)"/>
@@ -473,11 +496,10 @@
           <text x="232" y="52" fill="var(--accent)">0.9997</text>
         </g>
       </svg>
-      <p>How much a reward counts, by how far ahead it comes. With the old discount (0.999) a win eight minutes away counted about a third. Now that takes 28 minutes, the length of a long game.</p>
+      <p><b>Why:</b> real games last up to 25 minutes, the small map's six, and the agent's discount looked about eight minutes ahead, so whatever paid off later hardly counted. <b>The change:</b> a discount of 0.9997 instead of 0.999, about 28 minutes.</p>
     </div>
-
     <div class="card">
-      <div class="where">Real map</div>
+      <div class="where">16 October</div>
       <h4>Find room to build <span class="res">57% → 62%</span></h4>
       <svg viewBox="0 0 300 110" aria-hidden="true">
         <g fill="var(--muted)" opacity=".45">
@@ -496,11 +518,10 @@
           <text x="210" y="96" fill="var(--good)">fits</text>
         </g>
       </svg>
-      <p>Building spots the agent learned on the flat duel map often missed Echo Isles' trees, cliffs and blight, and the game refused three of four undead buildings. The harness now looks for a free spot three times farther out.</p>
+      <p><b>Why:</b> building spots learned on the flat duel map often missed Echo Isles' trees, cliffs and blight, and the game refused three of four undead buildings. <b>The change:</b> the harness looks for a free spot three times farther out.</p>
     </div>
-
     <div class="card">
-      <div class="where">Real map</div>
+      <div class="where">16 October</div>
       <h4>Half the hint <span class="res">62% → 72%</span></h4>
       <svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="50" x2="240" y2="50" stroke="var(--faint)" stroke-width="1.5"/>
@@ -516,11 +537,10 @@
           <text x="271" y="14" text-anchor="middle" fill="var(--accent)">win</text>
         </g>
       </svg>
-      <p>Besides +1 for a win and −1 for a loss, the agent gets small rewards as its material lead grows or shrinks (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>, which leaves the best play unchanged). At half the weight, the win counts for more.</p>
+      <p><b>Why:</b> besides +1 for a win and −1 for a loss, the agent gets small rewards as its material lead grows or shrinks (<a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">potential-based shaping</a>). With the longer horizon the win itself now reached far back, and the material rewards could pull towards trading armies rather than winning. <b>The change:</b> half their weight. The weakest races gained most.</p>
     </div>
-
     <div class="card">
-      <div class="where">Real map</div>
+      <div class="where">17 October</div>
       <h4>A looser anchor <span class="res">74% → 82%</span></h4>
       <svg viewBox="0 0 300 110" aria-hidden="true">
         <rect x="10" y="38" width="70" height="36" rx="8" fill="var(--card)" stroke="var(--faint)" stroke-width="1.5"/>
@@ -539,11 +559,10 @@
           <text x="232" y="72" fill="var(--good)">better play</text>
         </g>
       </svg>
-      <p>Two forces train the agent: the reward pushes it towards better play, and a KL term pulls it back towards an earlier version of itself, the anchor, for stability. Per update, the reward's push was about 1% signal and 99% noise, the anchor's pull was clean, and experiments kept ending level. A quarter of the pull let the agent move.</p>
+      <p><b>Why:</b> three experiments in a row ended level with where they started. Training has two forces: the reward pushes the agent towards better play, and a KL term pulls it back towards an earlier version of itself, the anchor, for stability. Measured per update, the push was about 1% signal and 99% noise, and the pull was clean. <b>The change:</b> a quarter of the pull. After about ninety minutes the agent pulled ahead.</p>
     </div>
-
     <div class="card">
-      <div class="where">Real map</div>
+      <div class="where">17 October</div>
       <h4>Give it a plan <span class="res">84% → 89%</span></h4>
       <svg viewBox="0 0 300 100" aria-hidden="true">
         <line x1="20" y1="44" x2="285" y2="44" stroke="var(--faint)" stroke-width="2"/>
@@ -557,12 +576,24 @@
         <text x="20" y="12" font-size="10.5" fill="var(--muted)">a target, for example</text>
         <text x="150" y="88" font-size="11" fill="var(--muted)" text-anchor="middle">→ an input to the network, and a small reward for following it</text>
       </svg>
-      <p>As in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the training games come with a target build order and tech path, drawn from 8,072 seen in games of the AI and of people. The agent follows the targets only loosely, yet it became a better player.</p>
+      <p><b>Why:</b> the agent played one strategy, an early rush, and its losses were long games without tech. <b>The change:</b> as in <a href="https://doi.org/10.1038/s41586-019-1724-z">AlphaStar</a>, half of the training games come with a target build order and tech path, drawn from 8,072 seen in games of the AI and of people, plus a small reward for following it. It follows the targets loosely, yet it became a better player.</p>
     </div>
-
   </div>
 
-  <p>And some that didn't help, each one a run in the log: rewarding hero levels, twice the learning rate, a bigger batch, more games for the weakest races, less of the built-in AI among the opponents, mixing imitation back in, an exploiter trained to beat the agent, more reward for following the target, annealing the material reward away, an anchor that moves along with the agent, and capping workers in the material reward.</p>
+  <figure class="breakout">
+    <div class="duo">
+      <figure>
+        <video src="media/early-echo.mp4" poster="media/early-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>15 October, the real game.</b> On its first day under the real rules, the agent (orc, blue) loses to an insane AI (undead, red) that pays a 27% tax, after 22 minutes and with 9,600 gold and 3,500 lumber unspent. The last two minutes at 4×.</figcaption>
+      </figure>
+      <figure>
+        <video src="media/now-echo.mp4" poster="media/now-echo-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
+        <figcaption><b>18 October, the real game.</b> The agent (night elf, red) destroys the base of the insane AI (human, blue) at full strength, eleven minutes in. The last two minutes at 4×.</figcaption>
+      </figure>
+    </div>
+  </figure>
+
+  <p>Many more didn't help, each one a run in the log: rewarding hero levels, twice the learning rate, a bigger batch, more games for the weakest races, less of the built-in AI among the opponents, mixing imitation back in, an exploiter trained to beat the agent, more reward for following the target, annealing the material reward away, an anchor that moves along with the agent, and capping workers in the material reward.</p>
 
   <p>Here is the agent today, with each of the four races.</p>
 
