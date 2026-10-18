@@ -86,6 +86,8 @@
   .step p b { font-family: var(--sans); font-size: .92em; }
   figure.mini { margin: 6px 0 14px; }
   figure.clip { margin: 8px 0 16px; }
+  figure.opd { margin: 6px 0 14px; }
+  figure.opd figcaption { margin-top: 6px; }
   figure.clip figcaption { margin-top: 6px; }
   figure.mini svg { display: block; width: 100%; max-width: 440px; height: auto; margin: 0 auto; font-family: var(--sans); }
   .maps text.mt { font: 700 16px var(--sans); fill: var(--fg); }
@@ -441,22 +443,19 @@
 
   <h3 class="chapter"><span>2 – 14 October</span>Six-minute games, against insane</h3>
 
-  <p>Next came a map with six-minute games and a harder target: the built-in AI on insane. Behavioral cloning started over here, on the AI's games on this map.</p>
+  <p>Next came a map with six-minute games and a harder target: the built-in AI on insane. Behavioral cloning started over here, on the AI's games on this map, and this time the tax worked only on paper. Most training games ended in a tie at the 20-minute limit: the agent out-built the taxed AI, sat on about 4,000 gold and lumber it never spent, and hardly attacked. The tax also hid its slow opening. At one minute the taxed AI had 7 supply against the agent's 15, while the untaxed AI had 21 and won the test games within five to seven minutes.</p>
 
   <div class="step">
     <div class="when">3 October</div>
     <h4>On-policy distillation from the built-in AI</h4>
-    <p><b>What was wrong.</b> After hours of self-play the agent still won only 1 of 98 test games. Behavioral cloning only shows the agent the situations the AI gets itself into, and a weaker player soon lands in others.</p>
+    <p><b>What was wrong.</b> After hours of self-play the agent had won only 1 of 98 test games. Behavioral cloning only shows the agent the situations the AI gets itself into, and the AI keeps its production queued: its games hardly ever show an idle barracks with money in the bank, so the agent never learned what to do there.</p>
     <figure class="clip">
         <video src="media/early-duelfast.mp4" poster="media/early-duelfast-poster.jpg" data-autoplay muted loop playsinline controls preload="none"></video>
         <figcaption><b>3 October.</b> The agent (undead, blue) loses its base to an insane AI (night elf, red) that even pays a 54% tax. The last two minutes at 4×.</figcaption>
       </figure>
 
     <p><b>The change.</b> <a href="https://arxiv.org/abs/2306.13649">On-policy distillation</a>: in half of the training games, the built-in AI labels the order it would give in every state the agent reaches, and a distillation loss moves the agent's orders towards those labels.</p>
-    <p><b>The outcome.</b> From 1 win in 98 test games to 13 in 50, within fifty minutes.</p>
-  </div>
-
-  <figure class="breakout">
+    <figure class="opd">
     <svg class="diagram" viewBox="0 0 720 270" role="img" aria-label="In the agent's own game, each state gets the agent's order, which is carried out, and the built-in AI's order, which is only recorded as a label; training moves the agent's orders towards the labels">
       <g font-size="13">
         <g fill="var(--muted)" text-anchor="end" font-size="12.5">
@@ -510,6 +509,10 @@
     </svg>
     <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, the distillation loss nudges the agent towards the AI's choice.</figcaption>
   </figure>
+    <p><b>The outcome.</b> From 1 win in 98 test games to 13 in 50, within fifty minutes, and the training games stopped ending in ties.</p>
+  </div>
+
+
 
   <p>A week and a half of experiments followed, most of them level.</p>
 
@@ -554,13 +557,13 @@
 
   <h3 class="chapter"><span>15 – 17 October</span>The real map</h3>
 
-  <div class="step">
-    <div class="when">15 October</div>
-    <h4>See the big map like the small one</h4>
-    <p><b>What was wrong.</b> On Echo Isles the agent's buildings landed in the trees, and its attacks went to where the enemy base used to be on the small map: 41 of its first 89 games tied.</p>
-    <p><b>The change.</b> Positions measured from its own base, at the scale it knew, with the enemy base where it expects it.</p>
-    <p><b>The outcome.</b> Trained on the fast rules on the real map, it then won 49% of its test games under the real rules straight away.</p>
-  </div>
+  <p>By 14 October the agent won 80% of its games against insane on the six-minute map, so it moved on to the real thing: Echo Isles. The real map is far bigger and busier than the duel map, and a few things had to change with it:</p>
+
+  <ul class="next">
+    <li><strong>Where things are.</strong> Positions are measured from the agent's own base, at the scale it knew from the duel map, and the stretch between the bases is squeezed so that the enemy base is where it expects it. Without that, its buildings landed in the trees and its attacks went to the middle of the map, where the enemy base used to be.</li>
+    <li><strong>Where it can point.</strong> The grid of target points grew from 128 to 352 bins a side, to cover the bigger map.</li>
+    <li><strong>The rules, in two steps.</strong> First the six-minute map's fast rules on Echo Isles, then the game's own.</li>
+  </ul>
 
   <figure class="breakout maps">
     <svg class="diagram" viewBox="0 0 960 600" role="img" aria-label="The duel map and Echo Isles at the same scale: Echo Isles is much larger, with both bases near its top, four gold mines, sixteen creep camps that drop items, a tavern, shops and mercenary camps">
@@ -629,7 +632,7 @@
     <figcaption>Both maps at the same scale, Echo Isles from its own minimap. The agent's frame keeps its own base at the duel map's scale and squeezes the stretch between the bases, so the enemy base is where it expects it.</figcaption>
   </figure>
 
-  <p>From there it climbed:</p>
+  <p>Trained on the fast rules on the real map, the agent won 49% of its test games under the real rules straight away. From there it climbed:</p>
 
   <figure class="chart">
     <p class="title">The real game on Echo Isles: games won against the insane AI</p>
