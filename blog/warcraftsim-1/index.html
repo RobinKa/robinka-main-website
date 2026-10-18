@@ -362,11 +362,11 @@
     <figcaption>One network plays one side. Hover over or tap a part to see what it does.</figcaption>
   </figure>
 
-  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The <strong>order head</strong> picks each unit's order: train this, build that, attack, move, cast, or nothing. Given the order, the <strong>target heads</strong> pick what it is aimed at: a pointer picks a unit in view, and a point is chosen as x and then y, so both coordinates belong to the same spot. The <strong>memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view. The <strong>value head</strong> estimates how the game will end; it reads hidden information and only helps training. It starts as a copy of the built-in AI, trained to imitate the AI's orders in thousands of its games. Then it learns from playing, with reinforcement learning (<a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five), against a league of opponents: itself, its past selves and the built-in AI.</p>
+  <p>The agent sees only what its player sees, and every half second it decides for every one of its units at once. The <strong>order head</strong> picks each unit's order: train this, build that, attack, move, cast, or nothing. Given the order, the <strong>target heads</strong> pick what it is aimed at: a pointer picks a unit in view, and a point is chosen as x and then y, so both coordinates belong to the same spot. The <strong>memory</strong> carries a state from step to step, so the agent can remember what it saw before it went out of view. The <strong>value head</strong> estimates how the game will end; it reads hidden information and only helps training. It starts as a copy of the built-in AI, trained by behavior cloning on the AI's orders in thousands of its games. Then it learns from playing, with reinforcement learning (<a href="https://arxiv.org/abs/1707.06347">PPO</a>, as in OpenAI Five), against a league of opponents: itself, its past selves and the built-in AI.</p>
 
   <h2>How it learned</h2>
 
-  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
+  <p>Starting on the full game would mean about 3,000 decisions per side before the one reward arrives, and an agent that loses every game has nothing to learn from. Even a copy of the built-in AI, trained by behavior cloning on the real map, lost all 40 of its test games. So the agent climbed a ladder of smaller games, each a step closer to the real thing. At every rung a problem showed up in the test games, an experiment went after it, and most experiments failed. These are the ones that worked, in the order they came.</p>
 
   <figure class="breakout">
     <div class="flow" role="img" aria-label="Micro fights, then two-minute games, six-minute games, Echo Isles with fast rules, Echo Isles with real rules">
@@ -392,7 +392,7 @@
 
   <h3 class="chapter"><span>27 September – 2 October</span>Two-minute games</h3>
 
-  <p>The whole game started on small copies of Echo Isles' main bases, with the rules sped up seven times so that a game took two minutes. The agent began as a copy of the built-in AI, trained to imitate its orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
+  <p>The whole game started on small copies of Echo Isles' main bases, with the rules sped up seven times so that a game took two minutes. The agent began as a copy of the built-in AI, trained by behavior cloning on its orders. On its first day of self-play it lost game after game, even against the <em>easy</em> AI.</p>
 
   <div class="step">
     <div class="when">28 September</div>
@@ -431,9 +431,9 @@
 
   <div class="step">
     <div class="when">3 October</div>
-    <h4>Ask the teacher, in the agent's own games</h4>
-    <p><b>What was wrong.</b> After hours of self-play the agent still won only 1 of 98 test games. A copy of the AI only knows the situations the AI gets itself into, and a weaker student soon lands in others.</p>
-    <p><b>The change.</b> As in <a href="https://arxiv.org/abs/2306.13649">on-policy distillation</a>, the built-in AI supervised the agent in the agent's own games: it labelled the order it would give in every state the agent reached, in half of the training games.</p>
+    <h4>On-policy distillation from the built-in AI</h4>
+    <p><b>What was wrong.</b> After hours of self-play the agent still won only 1 of 98 test games. Behavior cloning only shows the agent the situations the AI gets itself into, and a weaker player soon lands in others.</p>
+    <p><b>The change.</b> <a href="https://arxiv.org/abs/2306.13649">On-policy distillation</a>: in half of the training games, the built-in AI labels the order it would give in every state the agent reaches, and a distillation loss moves the agent's orders towards those labels.</p>
     <p><b>The outcome.</b> From 1 win in 98 test games to 13 in 50, within fifty minutes.</p>
   </div>
 
@@ -486,10 +486,10 @@
         <g fill="var(--fg)" text-anchor="middle">
           <text x="195" y="213">train a worker</text><text x="340" y="213">build a farm</text><text x="485" y="213">build a farm</text><text x="630" y="213">train a footman</text>
         </g>
-        <text x="412" y="258" text-anchor="middle" fill="var(--muted)" font-size="12.5">training: the reward for winning, plus a loss that moves each of the agent's orders towards the AI's label</text>
+        <text x="412" y="258" text-anchor="middle" fill="var(--muted)" font-size="12.5">training: the reward for winning, plus the distillation loss, which moves each of the agent's orders towards the AI's label</text>
       </g>
     </svg>
-    <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, training nudges the agent towards the AI's choice.</figcaption>
+    <figcaption>On-policy distillation in one of the agent's games. Every half second, each of its units gets the agent's order, which is carried out and leads to the next state, and the order the built-in AI would give in that same state, which is only recorded. Where they differ, the distillation loss nudges the agent towards the AI's choice.</figcaption>
   </figure>
 
   <p>A week and a half of experiments followed, most of them level.</p>
@@ -521,9 +521,9 @@
 
   <div class="step">
     <div class="when">14 October</div>
-    <h4>Stop listening to the teacher</h4>
-    <p><b>What was wrong.</b> The agent now won about 60% against insane: it had overtaken its teacher, yet the teacher's advice still drove most of each update.</p>
-    <p><b>The change.</b> No more advice.</p>
+    <h4>Turn on-policy distillation off</h4>
+    <p><b>What was wrong.</b> The agent now won about 60% against insane: it had overtaken the built-in AI, yet the distillation loss towards the AI's labels still drove most of each update.</p>
+    <p><b>The change.</b> The distillation loss off, and no more labels from the AI.</p>
     <p><b>The outcome.</b> 51% → 63% against insane, and training ran faster without the AI in the games.</p>
   </div>
 
@@ -722,7 +722,7 @@
     </div>
   </figure>
 
-  <p>Many more didn't help, each one a run in the log: rewarding hero levels, twice the learning rate, a bigger batch, more games for the weakest races, less of the built-in AI among the opponents, mixing imitation back in, an exploiter trained to beat the agent, more reward for following the target, annealing the material reward away, an anchor that moves along with the agent, and capping workers in the material reward.</p>
+  <p>Many more didn't help, each one a run in the log: rewarding hero levels, twice the learning rate, a bigger batch, more games for the weakest races, less of the built-in AI among the opponents, mixing behavior cloning back in, an exploiter trained to beat the agent, more reward for following the target, annealing the material reward away, an anchor that moves along with the agent, and capping workers in the material reward.</p>
 
   <p>Here is the agent today, with each of the four races.</p>
 
