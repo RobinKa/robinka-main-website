@@ -60,6 +60,11 @@
   .links { margin: 18px 0 0; font: 600 15px/1 var(--sans); }
   .links a { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--faint); border-radius: 999px; background: var(--card); color: var(--fg); text-decoration: none; }
   .links a:hover { border-color: var(--accent); color: var(--link); }
+  .cite { position: relative; margin: 0 0 18px; }
+  .cite pre { margin: 0; padding: 14px 16px; background: var(--card); border: 1px solid var(--faint); border-radius: 10px; overflow-x: auto; font: 13.5px/1.55 var(--mono); color: var(--fg); }
+  .cite code { background: none; padding: 0; border-radius: 0; font: inherit; }
+  .cite .copy { position: absolute; top: 8px; right: 8px; font: 600 12px/1 var(--sans); padding: 6px 10px; border: 1px solid var(--faint); border-radius: 999px; background: var(--bg); color: var(--muted); cursor: pointer; }
+  .cite .copy:hover { color: var(--link); border-color: var(--accent); }
   .links.contact { display: flex; flex-wrap: wrap; gap: 10px; }
   .tags { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
   .tags span { font: 600 12px/1 var(--sans); color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 6px 10px; }
@@ -912,6 +917,25 @@
 
   <p>The research continues, and I will write follow-up posts as it goes. The <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/overview.md">project’s documentation</a> has the details, and the <a href="https://github.com/RobinKa/warcraftsim/blob/master/docs/reference/experiment-log.md">experiment log</a> has every run.</p>
 
+  <h2>Citation</h2>
+
+  <p>If you refer to this post, please cite it as:</p>
+
+  <div class="cite">
+    <button type="button" class="copy" aria-label="Copy the citation">Copy</button>
+    <pre><code>@misc{kahlow2026warcraft,
+  author       = {Kahlow, Robin},
+  title        = {Beating {Warcraft III}'s insane {AI} with self-play
+                  reinforcement learning on one desktop},
+  year         = {2026},
+  month        = oct,
+  howpublished = {\url{https://warlock.ai/blog/warcraftsim-1/}},
+  note         = {Blog post}
+}</code></pre>
+  </div>
+
+  <p>To cite the code, use the citation in the <a href="https://github.com/RobinKa/warcraftsim">repository</a> (GitHub’s “Cite this repository” button).</p>
+
   <h2>Contact</h2>
 
   <p>Have questions or ideas, or want to work together? Get in touch, or join the Warcraft 3 AI server on Discord.</p>
@@ -933,6 +957,12 @@
     if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
   }), { threshold: 0.4 });
   document.querySelectorAll("video[data-autoplay]").forEach(v => io.observe(v));
+  // copy the citation
+  document.querySelectorAll(".cite .copy").forEach(b => b.addEventListener("click", () => {
+    const text = b.parentElement.querySelector("code").textContent;
+    navigator.clipboard.writeText(text).then(() => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1500); }, () => {});
+  }));
+
   // the architecture diagram: each part's explanation on hover, focus or tap
   document.querySelectorAll(".arch").forEach(fig => {
     const box = fig.querySelector(".tip-box");
